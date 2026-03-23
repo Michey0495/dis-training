@@ -901,7 +901,38 @@ git commit -m "議事メモから仕様書を作成"</div>
   <!-- Agent MDの設計 -->
   <div class="topic">
     <div class="topic-title"><span>01</span> Agent MD とは何か</div>
-    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px"><code>.github/copilot-instructions.md</code> というファイルをリポジトリに置くと、そのリポジトリでGitHub Copilotを使う全員がこのルールに従った出力を得ます。個人設定ではなくチーム設定です。</p>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px"><code>.github/copilot-instructions.md</code> というファイルをリポジトリに置くと、そのリポジトリでGitHub Copilotを使う全員がこのルールに従った出力を得ます。個人設定ではなくチーム設定です。実際のプロジェクトでは、これ単体ではなく複数の設定ファイルを組み合わせて使います。</p>
+
+    <button class="reveal-btn" data-label="実務で使う .github フォルダの全体構成" onclick="revealSection(this)">実務で使う .github フォルダの全体構成</button>
+    <div class="instructor-reveal">
+      <div class="code-block" style="white-space:pre;line-height:1.8"><span class="comment"># 推奨フォルダ構成</span>
+project-root/
+├── .github/
+│   ├── <span class="key">copilot-instructions.md</span>          <span class="comment"># 常時適用。プロジェクト全体のルール</span>
+│   ├── <span class="key">instructions/</span>                    <span class="comment"># ファイル種別ごとの細かいルール</span>
+│   │   ├── python.instructions.md       <span class="comment"># applyTo: "**/*.py"</span>
+│   │   ├── tests.instructions.md        <span class="comment"># applyTo: "tests/**"</span>
+│   │   └── data.instructions.md         <span class="comment"># applyTo: "**/data/**"</span>
+│   ├── <span class="key">AGENTS.md</span>                        <span class="comment"># Agent Mode の行動ルール</span>
+│   └── <span class="key">skills/</span>                          <span class="comment"># 再利用可能なタスク定義</span>
+│       ├── code-review/SKILL.md
+│       ├── test-generation/SKILL.md
+│       └── spec-to-code/SKILL.md
+└── <span class="key">.prompts/</span>                            <span class="comment"># よく使うプロンプト集</span>
+    ├── refactor.prompt.md
+    └── implement-feature.prompt.md</div>
+      <div class="tbl-wrap">
+      <table>
+        <tr><th>ファイル / フォルダ</th><th>役割</th><th>重要度</th></tr>
+        <tr><td class="highlight">copilot-instructions.md</td><td>全体に常時適用されるルール。コーディング規約・禁止事項・出力フォーマットを書く</td><td>必須</td></tr>
+        <tr><td class="highlight">instructions/</td><td>ファイル種別や配置場所ごとの追加ルール。applyTo でスコープを指定する</td><td>推奨</td></tr>
+        <tr><td class="highlight">AGENTS.md</td><td>Agent Mode で自律実行する際の行動制約。ファイル操作・Git操作・エスカレーション条件を定義する</td><td>推奨</td></tr>
+        <tr><td class="highlight">skills/</td><td>「レビューして」「テスト書いて」といった定型タスクを SKILL.md で定義し再利用する</td><td>便利</td></tr>
+        <tr><td class="highlight">.prompts/</td><td>プロジェクトルートに置くプロンプト集。Copilot Chat から呼び出せる</td><td>任意</td></tr>
+      </table>
+      </div>
+      <p style="font-size:.85rem;color:var(--gray-700);margin:12px 0">今日の研修では copilot-instructions.md を中心に扱いますが、配布素材のZIPには上記の全ファイルが入っています。研修後に展開して中身を確認してみてください。</p>
+    </div>
 
     <div class="callout callout-warn">
       <div class="callout-title">パスを間違えると一切効きません</div>
@@ -1968,75 +1999,72 @@ var GITHUB_COPILOT_INSTRUCTIONS = '# Copilot Instructions\n\n' +
 '## テスト\n\n- テストフレームワークは pytest を使う\n- テストファイルは test_ プレフィックスを付ける\n- 正常系・異常系（空データ、欠損値）の両方を書く\n- テストデータは @pytest.fixture で用意する\n\n' +
 '## エラーハンドリング\n\n- ファイル読み込みは FileNotFoundError を明示的にキャッチする\n- ユーザー向けエラーメッセージは日本語で出力する\n- スタックトレースは logging.exception() で記録する\n';
 
-var PROMPT_REVIEW = '# コードレビュー\n\n' +
-'選択されたコードまたは指定されたファイルをレビューしてください。\n\n' +
-'## レビュー観点\n\n' +
-'1. .github/copilot-instructions.md の規約に準拠しているか\n' +
-'2. 型ヒントが全ての引数と戻り値に付いているか\n' +
-'3. docstring が Google Style で書かれているか\n' +
-'4. エラーハンドリングは適切か（bare except がないか）\n' +
-'5. パフォーマンスに問題はないか（不要なループ、非効率な pandas 操作）\n' +
-'6. セキュリティリスクはないか\n\n' +
-'## 出力形式\n\n' +
-'- 問題がある箇所を行番号付きで指摘してください\n' +
-'- 各指摘に「修正案」のコードを添えてください\n' +
-'- 問題がなければ「問題なし」と回答してください\n';
+/* --- .github/instructions/ --- */
 
-var PROMPT_TEST = '# テストコード生成\n\n' +
-'指定されたファイルの関数に対して pytest のテストコードを生成してください。\n\n' +
-'## テスト要件\n\n' +
-'- 正常系テスト: 期待される入力に対して正しい結果が返るか\n' +
-'- 異常系テスト: 空の DataFrame、欠損値あり、不正な型の入力\n' +
-'- 境界値テスト: 1行のみ、大量データ（該当する場合）\n\n' +
-'## コーディング規約\n\n' +
-'- テストデータは @pytest.fixture で定義する\n' +
-'- テスト関数名は test_関数名_テスト内容 の形式にする\n' +
-'- assert 文には失敗時のメッセージを添える\n' +
-'- 1テスト関数につき1つの検証（Single Assertion Principle）\n\n' +
-'## 出力形式\n\n' +
-'test_ファイル名.py として保存できる完全なコードを出力してください。\nimport 文も含めてください。\n';
+var INSTRUCTIONS_PYTHON = '# Python コーディングルール\n\napplyTo: "**/*.py"\n\n' +
+'## バージョン・ランタイム\n\n- Python 3.12 を使用する\n- 仮想環境（venv）を前提とする\n- 依存ライブラリは requirements.txt で管理する\n\n' +
+'## 型ヒント\n\n- 全ての関数の引数と戻り値に型ヒントを付ける\n- コレクション型は `list[str]`, `dict[str, int]` のように具体型を書く\n- Optional は `str | None` 形式で書く（Python 3.10+ スタイル）\n- 型が複雑な場合は TypeAlias を使う\n\n' +
+'## docstring\n\n- Google Style で統一する\n- 公開関数には必ず書く。内部ヘルパーは省略可\n- Args, Returns, Raises の各セクションを必要に応じて書く\n\n' +
+'## 命名規則\n\n- 変数名・関数名: snake_case（英語）\n- クラス名: PascalCase（英語）\n- 定数: UPPER_SNAKE_CASE\n- プライベート: 先頭アンダースコア `_helper()`\n- コメント: 日本語で書く\n\n' +
+'## pandas 固有ルール\n\n- メソッドチェーンを使い、1行1操作で改行する\n- `inplace=True` は使わない（新しいDataFrameを返す）\n- カラム名はリテラル文字列で指定する（変数にしない）\n- CSV読み込みは `encoding="utf-8-sig"` を必ず指定する\n\n' +
+'## ファイル操作\n\n- ファイルパスは `pathlib.Path` を使う。`os.path.join()` や文字列結合は不可\n- ディレクトリ作成は `Path.mkdir(parents=True, exist_ok=True)`\n- with 文でファイルを開く\n\n' +
+'## import\n\n- 標準ライブラリ → サードパーティ → ローカルの順に分けて書く\n- `from module import *` は禁止\n- 未使用 import を残さない\n';
 
-var PROMPT_SPEC = '# 仕様書からコード生成\n\n' +
-'#file:spec.md の仕様に従ってPythonコードを生成してください。\n\n' +
-'## 生成ルール\n\n' +
-'- .github/copilot-instructions.md のコーディング規約に従う\n' +
-'- 仕様書に記載されていない機能は追加しない\n' +
-'- 各関数に Google Style の docstring を付ける\n' +
-'- 型ヒントを全ての引数と戻り値に付ける\n' +
-'- ファイル冒頭にモジュールの説明コメントを入れる\n\n' +
-'## 構成\n\n' +
-'- main() 関数をエントリーポイントにする\n' +
-'- if __name__ == "__main__": で main() を呼ぶ\n' +
-'- ファイルI/O、データ変換、集計ロジックは関数に分離する\n' +
-'- 出力先ディレクトリは output/ に固定する\n\n' +
-'## エラーハンドリング\n\n' +
-'- ファイルが見つからない場合は FileNotFoundError をキャッチして日本語メッセージを出す\n' +
-'- CSVの読み込みエラーは pd.errors.ParserError をキャッチする\n' +
-'- logging モジュールでエラーを記録する\n';
+var INSTRUCTIONS_TESTS = '# テストコード規約\n\napplyTo: "tests/**", "**/test_*.py"\n\n' +
+'## フレームワーク\n\n- pytest を使用する\n- unittest は使わない\n\n' +
+'## ファイル・関数命名\n\n- テストファイル: `test_<対象モジュール名>.py`\n- テスト関数: `test_<関数名>_<テスト内容>()`\n- 日本語でテスト内容を書きたい場合はdocstringに書き、関数名は英語を維持する\n\n' +
+'## テストデータ\n\n- `@pytest.fixture` でテストデータを定義する\n- テストデータは各テストファイルの先頭にまとめる\n- 外部ファイルを読むフィクスチャは `tmp_path` と組み合わせる\n\n' +
+'## テストケースの粒度\n\n- 1テスト関数につき1つの検証（Single Assertion Principle）\n- 正常系: 期待入力に対して正しい結果が返る\n- 異常系: 空データ、欠損値、不正な型\n- 境界値: 1行のみ、カラムが1つだけ\n\n' +
+'## assert の書き方\n\n- `assert result == expected, "期待値と一致しません"` のようにメッセージを添える\n- DataFrame の比較は `pd.testing.assert_frame_equal()` を使う\n- 浮動小数点は `pytest.approx()` で比較する\n\n' +
+'## 禁止事項\n\n- テスト内で print() を使わない\n- テスト間で状態を共有しない（各テストは独立）\n- 外部APIやDBに依存するテストを書かない（モックを使う）\n';
 
-var PROMPT_REFACTOR = '# リファクタリング\n\n' +
-'選択されたコードをリファクタリングしてください。\n\n' +
-'## リファクタリング方針\n\n' +
-'- .github/copilot-instructions.md の規約違反を修正する\n' +
-'- 50行を超える関数は責務ごとに分割する\n' +
-'- 深いネスト（3階層以上）は早期リターンで解消する\n' +
-'- マジックナンバーは名前付き定数に置き換える\n' +
-'- 重複コードは共通関数に抽出する\n\n' +
-'## 制約\n\n' +
-'- 外部から呼ばれる関数のシグネチャ（引数・戻り値の型）は変えない\n' +
-'- 既存のテストが通る状態を維持する\n' +
-'- 機能追加はしない。既存の動作を変えずに構造だけ改善する\n\n' +
-'## 出力形式\n\n' +
-'- リファクタリング後のコード全体を出力してください\n' +
-'- 変更した箇所にコメントで変更理由を添えてください\n';
+var INSTRUCTIONS_DATA = '# データ処理ルール\n\napplyTo: "**/data/**", "**/output/**"\n\n' +
+'## CSV入力\n\n- 文字コード: UTF-8（BOM付き: `utf-8-sig`）を前提とする\n- 読み込み時は必ず `encoding="utf-8-sig"` を指定する\n- ヘッダー行が必ず存在することを前提としてよい\n- 欠損値は `dropna()` または `fillna()` で明示的に処理する。暗黙のスキップはしない\n\n' +
+'## CSV出力\n\n- 文字コード: UTF-8（BOM付き: `utf-8-sig`）で出力する\n- `index=False` を指定する（DataFrameのindexは出力しない）\n- 出力先は `output/` ディレクトリに統一する\n- ファイル名は処理内容がわかる名前にする（例: `dept_monthly_sales.csv`）\n\n' +
+'## 数値フォーマット\n\n- 金額: 桁区切りなし、整数で出力\n- 構成比: 小数第1位まで（例: 35.2）\n- 日付: YYYY-MM-DD 形式\n\n' +
+'## データ検証\n\n- 読み込み直後に行数・カラム数をログに出す\n- 想定外のカラム名がある場合は KeyError ではなく明示的なエラーメッセージを出す\n- 集計結果が0件の場合は警告ログを出す\n';
 
-var PROMPT_COMMIT = '# コミットメッセージ生成\n\n' +
-'ステージングされた変更内容を読み取り、適切なコミットメッセージを生成してください。\n\n' +
-'## フォーマット\n\n```\n<種別>: <変更の要約（日本語、50文字以内）>\n\n<変更の詳細（日本語、必要に応じて箇条書き）>\n```\n\n' +
-'## 種別一覧\n\n' +
-'- feat: 新機能の追加\n- fix: バグ修正\n- refactor: リファクタリング（機能変更なし）\n' +
-'- test: テストの追加・修正\n- docs: ドキュメントの追加・修正\n- style: コードフォーマットの修正（動作に影響なし）\n\n' +
-'## ルール\n\n- 1行目は日本語で簡潔に\n- 詳細は「なぜ変更したか」を中心に書く\n- ファイル名の羅列だけにしない\n';
+/* --- .github/AGENTS.md --- */
+
+var AGENTS_MD = '# AGENTS.md\n\nGitHub Copilot の Agent Mode で自律的にタスクを実行する際のルールです。\n\n' +
+'## 基本方針\n\n- ユーザーの指示を正確に実行する。指示にない機能を勝手に追加しない\n- 不明点がある場合は推測せず、ユーザーに確認を求める\n- 1回のタスクでファイルを10個以上変更する場合は、事前に計画を提示する\n\n' +
+'## ファイル操作ルール\n\n- 新規ファイルは既存のディレクトリ構成に従って配置する\n- `output/` ディレクトリが存在しない場合は自動作成する\n- `.github/` 配下のファイルは変更しない（明示的に指示された場合を除く）\n- `.gitignore` に含まれるパターンのファイルは作成しない\n\n' +
+'## コード生成ルール\n\n- `.github/copilot-instructions.md` のルールに必ず従う\n- `.github/instructions/` 配下の該当ルールも参照する\n- 生成したコードは実行可能な状態にする（import漏れ、構文エラーを出さない）\n- テストコードを生成した場合は、テストが通ることを確認する\n\n' +
+'## Git 操作ルール\n\n- コミットメッセージは日本語で書く\n- 1コミットに1つの論理的な変更をまとめる\n- `main` ブランチに直接 push しない（ブランチを切ってPRを作る）\n- force push は禁止\n\n' +
+'## 禁止事項\n\n- 既存のテストを削除しない\n- ライブラリのバージョンを勝手に上げない\n- 環境変数やシークレットをコードに直書きしない\n- `rm -rf` や `git reset --hard` 等の破壊的コマンドを実行しない\n\n' +
+'## エスカレーション\n\n以下の場合はユーザーに確認を求める:\n- 既存の関数シグネチャを変更する必要がある場合\n- 新しい外部ライブラリを追加する必要がある場合\n- 仕様書に記載のない判断が必要な場合\n- エラーが解消できず3回以上リトライした場合\n';
+
+/* --- .github/skills/ --- */
+
+var SKILL_CODE_REVIEW = '# Skill: コードレビュー\n\n指定されたコードを `.github/copilot-instructions.md` の規約に基づいてレビューする。\n\n' +
+'## トリガー\n\nユーザーが「レビューして」「コードチェックして」「規約に合ってるか見て」と指示した場合。\n\n' +
+'## 手順\n\n1. 対象ファイルを読み込む\n2. `.github/copilot-instructions.md` と該当する `.github/instructions/*.instructions.md` を参照する\n3. 以下の観点でチェックする:\n   - 型ヒントが全引数・戻り値に付いているか\n   - docstring が Google Style か\n   - 命名規則（snake_case / PascalCase）に従っているか\n   - 禁止事項（bare except, print デバッグ, star import）に違反していないか\n   - pandas のメソッドチェーンが使われているか\n   - ファイルパスが pathlib.Path を使っているか\n4. 問題箇所を行番号付きで指摘し、修正案のコードを添える\n5. 問題がなければ「規約準拠: 問題なし」と報告する\n\n' +
+'## 出力形式\n\n```\n## レビュー結果\n\n### 指摘事項\n1. L12: bare except が使われています\n   修正案: `except FileNotFoundError:`\n2. L25: 型ヒントが欠落しています\n   修正案: `def process(df: pd.DataFrame) -> pd.DataFrame:`\n\n### 良い点\n- メソッドチェーンが適切に使われています\n- docstring が Google Style で統一されています\n```\n';
+
+var SKILL_TEST_GEN = '# Skill: テストコード生成\n\n指定されたPythonファイルの関数群に対して、pytest のテストコードを自動生成する。\n\n' +
+'## トリガー\n\nユーザーが「テストを書いて」「テストコードを生成して」「pytestを作って」と指示した場合。\n\n' +
+'## 手順\n\n1. 対象ファイルを読み込み、全ての公開関数を特定する\n2. `.github/instructions/tests.instructions.md` のルールに従う\n3. 各関数に対して以下のテストケースを生成する:\n   - 正常系: 標準的な入力に対して期待値を検証\n   - 空データ: 空の DataFrame や空文字列を渡した場合\n   - 欠損値: NaN や None が含まれるデータ\n   - 型エラー: 想定外の型が渡された場合（該当する場合のみ）\n4. テストデータは `@pytest.fixture` で定義する\n5. `test_<ファイル名>.py` として出力する\n\n' +
+'## 制約\n\n- テスト内で外部ファイルを直接読み込まない（`tmp_path` を使う）\n- テスト間で状態を共有しない\n- assert にはメッセージを添える\n- DataFrame の比較は `pd.testing.assert_frame_equal()` を使う\n\n' +
+'## 出力形式\n\n完全な Python ファイルとして出力する（import 文を含む）。\n';
+
+var SKILL_SPEC_TO_CODE = '# Skill: 仕様書からコード生成\n\nMarkdown 仕様書を読み取り、仕様に準拠した Python コードを生成する。\n\n' +
+'## トリガー\n\nユーザーが「仕様書から実装して」「spec.md に従ってコードを書いて」と指示した場合。\n\n' +
+'## 手順\n\n1. 指定された仕様書ファイル（通常 `spec.md`）を読み込む\n2. `.github/copilot-instructions.md` と `.github/instructions/python.instructions.md` のルールを適用する\n3. 仕様書から以下を抽出する:\n   - 機能一覧（何を作るか）\n   - データ構造（入力の形式）\n   - 出力仕様（出力ファイル名、カラム構成）\n   - 処理フロー（処理の順序）\n4. 以下の構成でコードを生成する:\n   - ファイル冒頭にモジュール説明コメント\n   - 各集計処理を独立した関数に分離\n   - `main()` 関数をエントリーポイントにする\n   - `if __name__ == "__main__":` で `main()` を呼ぶ\n5. 生成後、`.github/skills/code-review/SKILL.md` のチェック観点でセルフレビューする\n\n' +
+'## 制約\n\n- 仕様書に記載されていない機能は追加しない\n- 仕様書の記述が曖昧な場合はユーザーに確認を求める\n- 出力先ディレクトリは `output/` に固定する\n- エラーハンドリングは `.github/instructions/python.instructions.md` に従う\n\n' +
+'## 出力形式\n\n実行可能な Python ファイルとして出力する。\n';
+
+/* --- .prompts/ --- */
+
+var PROMPT_REFACTOR = '# リファクタリング\n\n選択されたコードをリファクタリングしてください。\n\n' +
+'## 方針\n\n- `.github/copilot-instructions.md` の規約違反を修正する\n- 50行を超える関数は責務ごとに分割する\n- 深いネスト（3階層以上）は早期リターンで解消する\n- マジックナンバーは名前付き定数に置き換える\n- 重複コードは共通関数に抽出する\n\n' +
+'## 制約\n\n- 外部から呼ばれる関数のシグネチャ（引数・戻り値の型）は変えない\n- 既存のテストが通る状態を維持する\n- 機能追加はしない。構造だけ改善する\n\n' +
+'## 出力\n\nリファクタリング後のコード全体を出力し、変更箇所にコメントで理由を添えてください。\n';
+
+var PROMPT_IMPLEMENT = '# 機能実装\n\n仕様書に記載された機能を実装してください。\n\n' +
+'## 入力\n\n- 仕様書ファイル（`spec.md` 等）を `#file:` で参照してください\n- 実装対象の機能名を明示してください\n\n' +
+'## 実装ルール\n\n- `.github/copilot-instructions.md` のコーディング規約に従う\n- 仕様書に記載されていない機能は追加しない\n- 各関数に型ヒントと Google Style docstring を付ける\n- エラーハンドリングは logging モジュールを使う\n- 出力先は `output/` ディレクトリに固定\n\n' +
+'## 構成\n\n- 処理を関数に分離する（1関数50行以内）\n- `main()` をエントリーポイントにする\n- `if __name__ == "__main__":` で起動する\n\n' +
+'## 出力\n\n実行可能な Python ファイルとして出力してください。import 文を含め、コピーしてそのまま動く状態にしてください。\n';
 
 /* ZIP一括ダウンロード */
 function downloadZip() {
@@ -2045,11 +2073,15 @@ function downloadZip() {
     { name: 'dis-handson/templates/copilot-instructions.md', content: HANDSON_AGENTMD },
     { name: 'dis-handson/data/sales_data.csv', content: HANDSON_CSV },
     { name: 'dis-handson/.github/copilot-instructions.md', content: GITHUB_COPILOT_INSTRUCTIONS },
-    { name: 'dis-handson/.github/copilot/prompts/review.prompt.md', content: PROMPT_REVIEW },
-    { name: 'dis-handson/.github/copilot/prompts/test.prompt.md', content: PROMPT_TEST },
-    { name: 'dis-handson/.github/copilot/prompts/spec-to-code.prompt.md', content: PROMPT_SPEC },
-    { name: 'dis-handson/.github/copilot/prompts/refactor.prompt.md', content: PROMPT_REFACTOR },
-    { name: 'dis-handson/.github/copilot/prompts/commit-message.prompt.md', content: PROMPT_COMMIT }
+    { name: 'dis-handson/.github/instructions/python.instructions.md', content: INSTRUCTIONS_PYTHON },
+    { name: 'dis-handson/.github/instructions/tests.instructions.md', content: INSTRUCTIONS_TESTS },
+    { name: 'dis-handson/.github/instructions/data.instructions.md', content: INSTRUCTIONS_DATA },
+    { name: 'dis-handson/.github/AGENTS.md', content: AGENTS_MD },
+    { name: 'dis-handson/.github/skills/code-review/SKILL.md', content: SKILL_CODE_REVIEW },
+    { name: 'dis-handson/.github/skills/test-generation/SKILL.md', content: SKILL_TEST_GEN },
+    { name: 'dis-handson/.github/skills/spec-to-code/SKILL.md', content: SKILL_SPEC_TO_CODE },
+    { name: 'dis-handson/.prompts/refactor.prompt.md', content: PROMPT_REFACTOR },
+    { name: 'dis-handson/.prompts/implement-feature.prompt.md', content: PROMPT_IMPLEMENT }
   ];
   var zipData = buildZip(files);
   var blob = new Blob([zipData], { type: 'application/zip' });
