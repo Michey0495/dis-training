@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VS Code × GitHub Copilot AI駆動開発研修</title>
+<style>
+:root{
+  --accent:#007ACC;
+  --accent-light:#E8F4FD;
+  --accent-dark:#005A9E;
+  --dark:#1A1A1A;
+  --gray-900:#2D2D2D;
+  --gray-700:#555;
+  --gray-500:#888;
+  --gray-300:#CCC;
+  --gray-100:#F5F5F5;
+  --white:#FFFFFF;
+  --font-sans:'Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic',sans-serif;
+  --font-mono:'SF Mono','Fira Code','Source Code Pro',monospace;
+  --max-w:960px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --radius:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--dark);background:var(--white);line-height:1.7}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ヘッダー */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--gray-100);
+  padding:12px 24px;
+}
+.header-inner{
+  max-width:var(--max-w);margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.header-logo{font-size:.95rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:8px}
+.header-logo span{color:var(--accent)}
+.header-nav{display:flex;gap:20px;font-size:.85rem;color:var(--gray-700);align-items:center}
+.header-nav a{color:var(--gray-700);font-weight:500}
+.header-nav a:hover{color:var(--accent);text-decoration:none}
+
+/* ヒーロー */
+.hero{
+  max-width:var(--max-w);margin:0 auto;
+  padding:80px 24px 60px;text-align:center;
+}
+.hero-badge{
+  display:inline-block;
+  background:var(--accent);color:var(--white);
+  font-size:.75rem;font-weight:700;
+  padding:4px 14px;border-radius:20px;
+  letter-spacing:.05em;margin-bottom:20px;
+}
+.hero h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:16px;letter-spacing:-.02em}
+.hero h1 span{color:var(--accent)}
+.hero-sub{font-size:.95rem;color:var(--gray-700);margin-bottom:24px}
+.hero-meta{
+  font-size:.9rem;color:var(--gray-700);
+  display:flex;flex-wrap:wrap;justify-content:center;gap:24px;margin-top:16px;
+}
+.hero-meta-item{display:flex;align-items:center;gap:6px}
+.hero-meta-item svg{width:16px;height:16px;color:var(--accent)}
+
+/* アジェンダ */
+.agenda{max-width:var(--max-w);margin:0 auto;padding:0 24px 60px}
+.agenda-title{
+  font-size:1.1rem;font-weight:700;margin-bottom:20px;
+  padding-left:12px;border-left:4px solid var(--accent);
+}
+.agenda-grid{display:grid;gap:12px}
+.agenda-card{
+  display:grid;grid-template-columns:80px 1fr;gap:16px;
+  padding:16px 20px;background:var(--gray-100);border-radius:var(--radius);
+  transition:transform .15s,box-shadow .15s;
+}
+.agenda-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.agenda-card.is-break{opacity:.6}
+.agenda-card.is-break:hover{transform:none;box-shadow:none}
+.agenda-time{font-size:.85rem;font-weight:700;color:var(--accent);padding-top:2px}
+.agenda-body h3{font-size:.95rem;font-weight:700;margin-bottom:4px}
+.agenda-body p{font-size:.8rem;color:var(--gray-700);line-height:1.6}
+.agenda-dur{
+  display:inline-block;font-size:.7rem;font-weight:600;color:var(--gray-500);
+  background:var(--white);padding:2px 8px;border-radius:4px;margin-left:8px;
+}
+
+/* セクション */
+.section{max-width:var(--max-w);margin:0 auto;padding:60px 24px}
+.section + .section{border-top:1px solid var(--gray-100)}
+.section-num{
+  font-size:.75rem;font-weight:700;color:var(--accent);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;
+}
+.section-title{font-size:1.6rem;font-weight:800;line-height:1.3;margin-bottom:12px;letter-spacing:-.01em}
+.section-lead{font-size:.95rem;color:var(--gray-700);margin-bottom:32px}
+
+/* カードグリッド */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:32px}
+.card{
+  background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);
+  padding:24px;transition:box-shadow .2s,transform .15s;position:relative;
+}
+.card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.card-label{font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:.05em;margin-bottom:8px}
+.card h4{font-size:1rem;font-weight:700;margin-bottom:8px}
+.card p{font-size:.85rem;color:var(--gray-700);line-height:1.7}
+.tool-icon{
+  position:absolute;top:12px;right:12px;
+  min-width:28px;height:22px;
+  border-radius:4px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:800;
+  color:var(--white);
+  letter-spacing:.02em;
+  padding:0 6px;
+  opacity:.85;
+}
+
+/* トピック */
+.topic{margin-bottom:40px}
+.topic-title{
+  font-size:1.15rem;font-weight:700;margin-bottom:12px;
+  padding-bottom:8px;border-bottom:2px solid var(--gray-100);
+}
+.topic-title span{color:var(--accent)}
+
+/* テーブル */
+.tbl-wrap{overflow-x:auto;margin:24px 0}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{
+  background:var(--dark);color:var(--white);
+  padding:10px 14px;text-align:left;font-weight:600;font-size:.8rem;
+}
+th:first-child{border-radius:var(--radius) 0 0 0}
+th:last-child{border-radius:0 var(--radius) 0 0}
+td{padding:10px 14px;border-bottom:1px solid var(--gray-100)}
+tr:nth-child(even) td{background:var(--gray-100)}
+td.highlight{color:var(--accent);font-weight:600}
+
+/* コードブロック */
+.code-block{
+  background:var(--gray-900);color:#E0E0E0;border-radius:var(--radius);
+  padding:20px 24px;font-family:var(--font-mono);font-size:.82rem;
+  line-height:1.7;overflow-x:auto;margin:16px 0;
+}
+.code-block .comment{color:#6A9955}
+.code-block .key{color:#9CDCFE}
+.code-block .str{color:#CE9178}
+.code-block .kw{color:#569CD6}
+
+/* ダイアグラム */
+.diagram{
+  background:var(--gray-100);border-radius:var(--radius);
+  padding:32px;text-align:center;margin:24px 0;
+  font-family:var(--font-mono);font-size:.82rem;line-height:1.8;
+  white-space:pre;overflow-x:auto;
+}
+
+/* コールアウト */
+.callout{
+  background:var(--accent-light);
+  border-left:4px solid var(--accent);
+  border-radius:0 var(--radius) var(--radius) 0;
+  padding:20px 24px;margin:24px 0;
+}
+.callout-title{font-size:.85rem;font-weight:700;color:var(--accent);margin-bottom:6px}
+.callout p{font-size:.85rem;color:var(--gray-700);line-height:1.7}
+.callout-warn{background:#FFF8E1;border-left-color:#F9A825}
+.callout-warn .callout-title{color:#F57F17}
+.callout-handson{background:#E8F5E9;border-left-color:#43A047}
+.callout-handson .callout-title{color:#2E7D32}
+
+/* チェックリスト */
+.check-list{list-style:none;padding:0;margin:12px 0}
+.check-list li{position:relative;padding:6px 0 6px 28px;font-size:.88rem;color:var(--gray-700)}
+.check-list li::before{
+  content:'';position:absolute;left:0;top:10px;
+  width:16px;height:16px;border:2px solid var(--accent);border-radius:50%;
+}
+.check-list li::after{
+  content:'';position:absolute;left:4px;top:14px;
+  width:8px;height:4px;
+  border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);
+  transform:rotate(-45deg);
+}
+
+/* フロー */
+.flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:20px 0}
+.flow-step{
+  background:var(--white);border:2px solid var(--gray-100);border-radius:var(--radius);
+  padding:12px 18px;font-size:.82rem;font-weight:600;text-align:center;min-width:120px;
+}
+.flow-step.is-active{border-color:var(--accent);color:var(--accent)}
+.flow-arrow{color:var(--gray-300);font-size:1.2rem}
+
+/* ディスカッション */
+.disc{background:var(--gray-100);border-radius:var(--radius);padding:28px;margin:20px 0}
+.disc-q{font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--dark)}
+.disc-point{margin-bottom:16px}
+.disc-point h5{font-size:.88rem;font-weight:700;color:var(--accent);margin-bottom:6px}
+.disc-point p{font-size:.85rem;color:var(--gray-700);line-height:1.7}
+.disc-answer{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.disc-answer.is-open{max-height:2000px}
+.disc-toggle{
+  display:inline-flex;align-items:center;gap:6px;
+  background:none;border:1px solid var(--gray-300);
+  color:var(--gray-500);
+  font-size:.78rem;font-weight:600;
+  padding:6px 14px;border-radius:var(--radius);
+  cursor:pointer;transition:color .2s,border-color .2s;
+  margin-top:10px;
+}
+.disc-toggle:hover,.disc-toggle.is-open{color:var(--accent);border-color:var(--accent)}
+
+/* スタット */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:24px 0}
+.stat{text-align:center;padding:24px 16px;background:var(--gray-100);border-radius:var(--radius)}
+.stat-num{font-size:2rem;font-weight:800;color:var(--accent);line-height:1}
+.stat-label{font-size:.8rem;color:var(--gray-700);margin-top:8px}
+.reveal-num{
+  display:inline-block;filter:blur(12px);
+  transition:filter .4s ease;cursor:pointer;user-select:none;
+}
+.reveal-num.is-revealed{filter:none}
+
+/* ソースバッジ */
+.source-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.65rem;font-weight:600;
+  color:var(--gray-500);background:var(--gray-100);
+  padding:2px 8px;border-radius:4px;text-decoration:none;
+  vertical-align:middle;margin-left:4px;
+  transition:color .2s,background .2s;
+}
+.source-badge:hover{color:var(--accent);background:var(--accent-light);text-decoration:none}
+
+/* ソースリスト */
+.sources{margin-top:40px;padding:20px 24px;background:var(--gray-100);border-radius:var(--radius)}
+.sources-title{
+  font-size:.8rem;font-weight:700;color:var(--gray-500);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;
+}
+.sources-list{list-style:none;padding:0;margin:0;columns:2;column-gap:32px}
+.sources-list li{font-size:.8rem;color:var(--gray-700);padding:3px 0;break-inside:avoid}
+.sources-list a{font-weight:500}
+@media(max-width:640px){.sources-list{columns:1}}
+
+/* 段階開示 */
+.instructor-reveal{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.instructor-reveal.is-open{max-height:5000px}
+.reveal-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--white);border:1px dashed var(--gray-300);
+  color:var(--gray-500);
+  font-size:.78rem;font-weight:600;
+  padding:8px 16px;border-radius:var(--radius);
+  cursor:pointer;transition:all .2s;margin:12px 0;
+}
+.reveal-btn:hover{color:var(--accent);border-color:var(--accent)}
+.reveal-btn.is-open{border-style:solid;color:var(--accent);border-color:var(--accent)}
+.eye-ico{vertical-align:-.125em;margin-left:2px}
+
+/* 全表示トグル */
+.toggle-all-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--dark);color:var(--white);
+  font-size:.72rem;font-weight:600;
+  padding:6px 14px;border:none;border-radius:var(--radius);
+  cursor:pointer;transition:background .2s;
+  letter-spacing:.03em;white-space:nowrap;
+}
+.toggle-all-btn:hover{background:var(--accent-dark)}
+.toggle-all-btn.is-active{background:var(--accent)}
+
+/* デモボタン */
+.demo-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:var(--white);
+  font-size:.85rem;font-weight:700;
+  padding:10px 22px;border:none;border-radius:var(--radius);
+  cursor:pointer;transition:background .2s,transform .15s;
+  letter-spacing:.03em;margin:16px 0;
+}
+.demo-btn:hover{background:var(--accent-dark);transform:translateY(-1px)}
+.demo-btn:active{transform:translateY(0)}
+.demo-btn svg{width:18px;height:18px;flex-shrink:0}
+
+/* モーダル */
+.modal-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;
+  padding:24px;opacity:0;transition:opacity .25s;
+}
+.modal-overlay.is-open{display:flex;opacity:1}
+.modal{
+  background:var(--white);border-radius:12px;
+  max-width:720px;width:100%;max-height:85vh;overflow-y:auto;
+  box-shadow:0 8px 40px rgba(0,0,0,.2);
+  animation:modalIn .3s ease;
+}
+@keyframes modalIn{from{transform:translateY(20px) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 28px 16px;border-bottom:1px solid var(--gray-100);
+}
+.modal-header h3{font-size:1.1rem;font-weight:800}
+.modal-close{
+  width:32px;height:32px;background:var(--gray-100);border:none;border-radius:50%;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;
+}
+.modal-close:hover{background:var(--gray-300)}
+.modal-close svg{width:16px;height:16px;color:var(--gray-700)}
+.modal-body{padding:24px 28px 28px}
+.modal-tabs{display:flex;gap:0;border-bottom:2px solid var(--gray-100);margin-bottom:20px}
+.modal-tab{
+  padding:10px 20px;font-size:.85rem;font-weight:600;color:var(--gray-500);
+  background:none;border:none;cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .2s,border-color .2s;
+}
+.modal-tab.is-active{color:var(--accent);border-bottom-color:var(--accent)}
+.modal-tab:hover:not(.is-active){color:var(--dark)}
+.modal-panel{display:none}
+.modal-panel.is-active{display:block}
+.modal-panel h4{font-size:.95rem;font-weight:700;margin-bottom:10px;color:var(--dark)}
+.modal-panel p{font-size:.88rem;color:var(--gray-700);line-height:1.75;margin-bottom:14px}
+.demo-step{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--gray-100)}
+.demo-step:last-child{border-bottom:none}
+.demo-step-num{
+  width:28px;height:28px;flex-shrink:0;
+  background:var(--accent);color:var(--white);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;margin-top:2px;
+}
+.demo-step-body{flex:1}
+.demo-step-body strong{font-size:.88rem;color:var(--dark)}
+.demo-step-body p{margin-top:4px;margin-bottom:0;font-size:.82rem}
+.adv-tag{
+  display:inline-block;background:var(--gray-100);color:var(--accent);
+  font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:4px;
+  letter-spacing:.05em;margin-bottom:12px;
+}
+
+/* 自分で試す */
+.try-section{margin-top:24px;padding-top:20px;border-top:1px solid var(--gray-100)}
+.try-section-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px}
+.try-prompt{position:relative;background:var(--gray-100);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+.try-prompt-label{font-size:.7rem;font-weight:700;color:var(--accent);margin-bottom:6px}
+.try-prompt-code{font-size:.82rem;line-height:1.6;white-space:pre-wrap;color:var(--dark)}
+.try-copy-btn{position:absolute;top:10px;right:10px;background:var(--white);border:1px solid var(--gray-300);border-radius:4px;padding:3px 10px;font-size:.7rem;cursor:pointer;color:var(--gray-500);transition:color .2s}
+.try-copy-btn:hover{color:var(--accent)}
+.try-download-btn{display:inline-flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--gray-300);border-radius:var(--radius);padding:8px 16px;font-size:.8rem;color:var(--dark);cursor:pointer;transition:border-color .2s,color .2s;margin-top:4px}
+.try-download-btn:hover{border-color:var(--accent);color:var(--accent)}
+.try-download-btn svg{width:16px;height:16px}
+
+/* ハンズオンブロック */
+.handson-block{
+  background:var(--white);border:2px solid #43A047;border-radius:var(--radius);
+  padding:28px;margin:24px 0;
+}
+.handson-header{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.handson-badge{
+  background:#43A047;color:var(--white);
+  font-size:.7rem;font-weight:700;
+  padding:4px 12px;border-radius:4px;
+  letter-spacing:.05em;
+}
+.handson-title{font-size:1.1rem;font-weight:700;color:var(--dark)}
+.handson-step{
+  display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--gray-100);
+}
+.handson-step:last-child{border-bottom:none}
+.handson-step-num{
+  width:28px;height:28px;flex-shrink:0;
+  background:#43A047;color:var(--white);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;margin-top:2px;
+}
+.handson-step-body{flex:1}
+.handson-step-body strong{font-size:.88rem;color:var(--dark)}
+.handson-step-body p{margin-top:4px;margin-bottom:0;font-size:.85rem;color:var(--gray-700);line-height:1.7}
+
+/* フッター */
+.site-footer{
+  max-width:var(--max-w);margin:0 auto;padding:40px 24px;
+  border-top:1px solid var(--gray-100);text-align:center;
+  font-size:.8rem;color:var(--gray-500);
+}
+
+/* レスポンシブ */
+@media(max-width:640px){
+  .hero h1{font-size:1.5rem}
+  .section-title{font-size:1.3rem}
+  .agenda-card{grid-template-columns:1fr}
+  .header-nav{display:none}
+  .flow{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+}
+
+/* 環境準備セクション */
+.prep-section{max-width:var(--max-w);margin:0 auto;padding:0 24px 40px}
+.prep-card{
+  background:var(--accent-light);border:1px solid var(--accent);
+  border-radius:var(--radius);padding:28px;
+}
+.prep-card-title{font-size:1rem;font-weight:700;color:var(--accent-dark);margin-bottom:16px}
+.prep-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.zip-download-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:var(--white);
+  font-size:.85rem;font-weight:700;
+  padding:12px 24px;border:none;border-radius:var(--radius);
+  cursor:pointer;transition:background .2s;
+}
+.zip-download-btn:hover{background:var(--accent-dark)}
+.zip-download-btn svg{width:18px;height:18px}
+/* 素材ダウンロードエリア */
+.material-dl{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;
+  padding:16px;background:var(--gray-100);border-radius:var(--radius);
+}
+.material-dl-title{
+  width:100%;font-size:.75rem;font-weight:700;color:var(--gray-500);
+  letter-spacing:.06em;margin-bottom:4px;
+}
+/* 比較テーブル追加用 */
+.tool-compare-tbl td,.tool-compare-tbl th{font-size:.8rem;padding:8px 12px}
+
+/* 印刷 */
+@media print{
+  .site-header{position:static}
+  .card:hover,.agenda-card:hover{transform:none;box-shadow:none}
+  .demo-btn,.toggle-all-btn,.disc-toggle,.reveal-btn,.zip-download-btn,.try-download-btn{display:none}
+  .modal-overlay{display:none !important}
+  .reveal-num{filter:none !important}
+  .disc-answer,.instructor-reveal{max-height:none !important;overflow:visible !important}
+  .try-section,.material-dl,.prep-actions{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="site-header">
+<div class="header-inner">
+  <div class="header-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" style="color:var(--accent)">
+      <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+    </svg>
+    <span>DIS</span> AI駆動開発研修
+  </div>
+  <nav class="header-nav">
+    <a href="#session01">01 Opening</a>
+    <a href="#session02">02 Context + Spec</a>
+    <a href="#session03">03 Agent MD + Dev</a>
+    <a href="#session04">04 Summary</a>
+    <a href="#appendix">Appendix</a>
+    <button class="toggle-all-btn" id="toggleAllBtn" onclick="toggleAll()">全表示</button>
+  </nav>
+</div>
+</header>
+
+<!-- ========== HERO ========== -->
+<div class="hero">
+  <div class="hero-badge">HANDS-ON TRAINING</div>
+  <h1>VS Code × <span>GitHub Copilot</span><br>AI駆動開発研修</h1>
+  <p class="hero-sub">メモ1枚から仕様書、Agent MD、動くアプリ、AIレビューまで。上流から下流を一気通貫で体験する4時間。</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      2026年3月
+    </div>
+    <div class="hero-meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      4時間
+    </div>
+    <div class="hero-meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      6-7名
+    </div>
+    <div class="hero-meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+      オンライン
+    </div>
+  </div>
+</div>
+
+<!-- ========== 環境準備 ========== -->
+<div class="prep-section">
+  <div class="prep-card">
+    <div class="prep-card-title">環境準備</div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:12px">研修を始める前に、以下の環境が整っていることをご確認ください。ハンズオンで使う素材は一括でダウンロードできます。</p>
+    <ul class="check-list">
+      <li>VS Code 最新版がインストールされている</li>
+      <li>GitHub Copilot 拡張機能が有効（右下アイコンが青色）</li>
+      <li>Python 3.11以上が動作する（<code>python --version</code>）</li>
+      <li>Git がインストールされている（<code>git --version</code>）</li>
+      <li>pandas がインストールされている（<code>pip install pandas</code>）</li>
+    </ul>
+    <div class="prep-actions">
+      <button class="zip-download-btn" onclick="downloadZip()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        ハンズオン素材を一括ダウンロード（ZIP）
+      </button>
+    </div>
+    <p style="font-size:.75rem;color:var(--gray-500);margin-top:8px">ZIP内に議事メモ、Agent MDテンプレート、サンプルCSVが含まれます。各セッションのハンズオンブロックからも個別にダウンロードできます。</p>
+  </div>
+</div>
+
+<!-- ========== AGENDA ========== -->
+<div class="agenda">
+  <div class="agenda-title">タイムテーブル</div>
+  <div class="agenda-grid">
+    <a href="#session01" class="agenda-card" style="text-decoration:none;color:inherit">
+      <div class="agenda-time">00:00</div>
+      <div class="agenda-body">
+        <h3>Session 01 : オープニング<span class="agenda-dur">10分</span></h3>
+        <p>研修ゴールと全体マップ / 環境チェック / GitHub Copilotの基本操作確認</p>
+      </div>
+    </a>
+    <a href="#session02" class="agenda-card" style="text-decoration:none;color:inherit">
+      <div class="agenda-time">00:10</div>
+      <div class="agenda-body">
+        <h3>Session 02 : コンテキスト設計と仕様駆動開発<span class="agenda-dur">80分</span></h3>
+        <p>コンテキストエンジニアリング / 上流工程でのAI活用 / 仕様書作成ハンズオン</p>
+      </div>
+    </a>
+    <div class="agenda-card is-break">
+      <div class="agenda-time">01:30</div>
+      <div class="agenda-body"><h3>休憩<span class="agenda-dur">10分</span></h3></div>
+    </div>
+    <a href="#session03" class="agenda-card" style="text-decoration:none;color:inherit">
+      <div class="agenda-time">01:40</div>
+      <div class="agenda-body">
+        <h3>Session 03 : Agent MD + 実装 + テスト<span class="agenda-dur">90分</span></h3>
+        <p>Agent MD設計 / 比較デモ / テストコード生成 / ミニアプリ開発ハンズオン</p>
+      </div>
+    </a>
+    <div class="agenda-card is-break">
+      <div class="agenda-time">03:10</div>
+      <div class="agenda-body"><h3>休憩<span class="agenda-dur">10分</span></h3></div>
+    </div>
+    <a href="#session04" class="agenda-card" style="text-decoration:none;color:inherit">
+      <div class="agenda-time">03:20</div>
+      <div class="agenda-body">
+        <h3>Session 04 : まとめと今後の展望<span class="agenda-dur">30分</span></h3>
+        <p>振り返り / 他の生成AI開発ツール / バイブコーディング / エンジニアの3年後</p>
+      </div>
+    </a>
+    <div class="agenda-card is-break">
+      <div class="agenda-time">03:50</div>
+      <div class="agenda-body"><h3>質疑応答 + 閉会<span class="agenda-dur">10分</span></h3></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- SESSION 01 : オープニング -->
+<!-- ========================================================================== -->
+<div class="section" id="session01">
+  <div class="section-num">Session 01</div>
+  <div class="section-title">オープニング</div>
+  <p class="section-lead">研修の全体像を把握し、手元の環境が動くことを確認します。この10分で全員のスタートラインを揃えます。</p>
+
+  <div class="topic">
+    <div class="topic-title"><span>01</span> 研修のゴール</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:20px">今日の4時間で「メモ1枚を起点に、仕様書を書き、Agent MDを整備し、動くアプリを作り、AIにレビューさせてcommitする」までの一連の開発フローを自分の手で体験します。持ち帰るのは3つの成果物と、それを支える「型」そのものです。</p>
+    <div class="flow">
+      <div class="flow-step is-active">議事メモ</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">仕様書</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">Agent MD</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">実装</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">AIレビュー</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">commit</div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-title"><span>02</span> 環境チェック</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">以下の4つが動作する状態を確認してください。問題があれば講師にお声がけください。</p>
+    <ul class="check-list">
+      <li>VS Code 最新版がインストールされている</li>
+      <li>GitHub Copilot 拡張機能が有効になっている（右下のアイコンで確認）</li>
+      <li>Python 3.11以上が動作する（ターミナルで <code>python --version</code>）</li>
+      <li>Git がインストールされている（ターミナルで <code>git --version</code>）</li>
+      <li>pandas がインストールされている（<code>pip install pandas</code>）</li>
+    </ul>
+
+    <div class="callout">
+      <div class="callout-title">Tip : Copilot拡張が灰色の場合</div>
+      <p>VS Code右下のCopilotアイコンが灰色（無効状態）のときは、アイコンをクリックして「Enable Globally」を選択してください。それでも有効にならない場合は、VS Codeの拡張機能パネル（Ctrl+Shift+X）で「GitHub Copilot」「GitHub Copilot Chat」の2つがインストール済みかを確認し、「Reload Required」と出ていればウィンドウを再読み込みしてください。</p>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">python が通らない場合</div>
+      <p><code>python3 --version</code> を試してください。動けば以降の手順は python を python3 に読み替えます。Windowsで <code>python</code> がMicrosoft Storeを開く場合は、Python公式サイトからインストーラーを入れ直すか、VS Codeターミナルのシェル種別を確認してください。</p>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-title"><span>03</span> GitHub Copilot の基本操作</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">本研修で使う3つの機能を確認します。</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>機能</th><th>起動方法（Windows）</th><th>起動方法（Mac）</th><th>用途</th></tr>
+      <tr><td class="highlight">Copilot Chat</td><td>Ctrl + Shift + I</td><td>Cmd + Shift + I</td><td>対話形式でコード生成・質問・レビュー</td></tr>
+      <tr><td class="highlight">インラインチャット</td><td>Ctrl + I</td><td>Cmd + I</td><td>選択範囲のリファクタリング・説明</td></tr>
+      <tr><td class="highlight">コード補完</td><td colspan="2">Tab で受け入れ / Esc でキャンセル</td><td>入力中にリアルタイムでコードを提案</td></tr>
+    </table>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Tip</div>
+      <p><code>#file:ファイル名</code> でチャット内に特定ファイルの中身を渡せます。<code>@workspace</code> でリポジトリ全体を文脈に含められます。この2つを使いこなせるかどうかで出力品質が変わります。</p>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">@workspace のトークン消費に注意</div>
+      <p><code>@workspace</code> はリポジトリ全体を文脈に渡すため、トークンを大量に消費します。ファイル数が多い大規模リポジトリでは応答が遅くなったり、文脈が溢れて精度が落ちることがあります。対象ファイルが明確な場合は <code>#file:</code> で個別に指定するほうが確実です。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- SESSION 02 : コンテキスト設計と仕様駆動開発 -->
+<!-- ========================================================================== -->
+<div class="section" id="session02">
+  <div class="section-num">Session 02</div>
+  <div class="section-title">コンテキスト設計と仕様駆動開発</div>
+  <p class="section-lead">GitHub Copilotの出力品質は渡す文脈で決まります。プロンプトの小手先テクニックではなく、AIに渡す情報の設計こそが生産性を分けるという話から始め、仕様を先に書いてAIに実装させる順番を体験します。</p>
+
+  <!-- コンテキストエンジニアリング -->
+  <div class="topic">
+    <div class="topic-title"><span>01</span> コンテキストエンジニアリングとは</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:20px">AIの出力品質を決める3つの文脈層があります。プロジェクト設定（Agent MD）、開いているファイル群、指示の精度。この3つを設計するのがコンテキストエンジニアリングです。</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">文脈層 1</div>
+        <h4>プロジェクト設定（Agent MD）</h4>
+        <p>copilot-instructions.md に書かれた規約・禁止事項。リポジトリに入れるだけでチーム全員のCopilotが従います。Session 03で詳しく扱います。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">文脈層 2</div>
+        <h4>開いているファイル群</h4>
+        <p>VS Codeのタブに開いているファイルがCopilotの文脈に入ります。関連ファイルを開いておくだけで出力精度が上がります。#file: で明示的に渡すとさらに確実です。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">文脈層 3</div>
+        <h4>指示の精度</h4>
+        <p>「何を」「どの形式で」「何を除外して」生成するか。制約指示が効くかどうかが出力品質の分かれ目になります。</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">事例 : 同じ指示でも文脈で出力が変わる</div>
+      <p>「CSVを読み込んで集計する関数を書いて」という指示を2通りの方法で試した結果です。</p>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># 文脈なしで指示した場合の出力例</span>
+<span class="kw">def</span> <span class="key">process</span>(file):
+    data = pd.read_csv(file)
+    result = data.groupby(<span class="str">'部門'</span>).sum()
+    result.to_csv(<span class="str">'output.csv'</span>)
+    <span class="comment"># 型ヒントなし、変数名が曖昧、エラー処理なし</span></div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># Agent MD + 仕様書を文脈に渡した場合の出力例</span>
+<span class="kw">def</span> <span class="key">aggregate_sales_by_dept</span>(input_path: Path) -&gt; pd.DataFrame:
+    <span class="str">"""部門別の売上合計を算出する。
+
+    Args:
+        input_path: 売上データCSVのファイルパス
+
+    Returns:
+        部門ごとの売上合計DataFrame
+    """</span>
+    df = pd.read_csv(input_path, encoding=<span class="str">"utf-8-sig"</span>)
+    <span class="kw">return</span> (
+        df.dropna(subset=[<span class="str">"売上金額"</span>])
+        .groupby(<span class="str">"部門"</span>, as_index=<span class="kw">False</span>)
+        .agg(売上合計=(<span class="str">"売上金額"</span>, <span class="str">"sum"</span>))
+    )
+    <span class="comment"># 型ヒント付き、Google Style docstring、メソッドチェーン</span></div>
+    <p style="font-size:.85rem;color:var(--gray-700);margin:12px 0">渡す文脈が違うだけで、同じツールの出力がここまで変わります。プロンプトの書き方を工夫する前に、何を渡すかを設計するのが先です。</p>
+
+    <div class="disc">
+      <div class="disc-q">「チャットで聞いて要約を編集する」使い方と「文脈を設計して一発で正しい出力を得る」使い方。この差は何から生まれると思いますか?</div>
+      <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:8px">まずは皆さんで考えてみてください。</p>
+      <button class="disc-toggle" onclick="toggleDisc(this)">回答</button>
+      <div class="disc-answer">
+        <div class="disc-point" style="margin-top:14px">
+          <h5>差の正体は「事前設計の有無」</h5>
+          <p>チャットで何度もやり取りするのは、必要な文脈をその場で思いつきで渡しているから。仕様書やAgent MDを事前に書いておけば、1回の指示で精度の高い出力が得られます。事後の修正コストと事前の設計コスト、どちらが安いかという話です。</p>
+        </div>
+        <div class="disc-point">
+          <h5>コンテキスト設計はチーム施策</h5>
+          <p>個人がプロンプトを工夫するのは属人的。Agent MDをリポジトリに入れるのはチーム施策。仕組みで解決すれば、メンバー全員のAI出力品質が揃います。</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="reveal-btn" data-label="Claude Codeから降りてきた機能の系譜" onclick="revealSection(this)">Claude Codeから降りてきた機能の系譜</button>
+    <div class="instructor-reveal">
+      <p style="font-size:.9rem;color:var(--gray-700);margin:16px 0">copilot-instructions.md の設計思想は <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank">Claude Code</a> の CLAUDE.md が原型です。エージェントモードも同じ系譜。GitHub Copilotの「新機能」として見るのではなく、AI開発ツールに共通する設計思想として理解すると、ツールが変わっても応用が利きます。</p>
+      <div class="flow">
+        <div class="flow-step is-active">Claude Code<br><small>CLAUDE.md</small></div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">GitHub Copilot<br><small>copilot-instructions.md</small></div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">Cursor / Kiro<br><small>.cursor/rules 等</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI駆動ドキュメンテーション -->
+  <div class="topic">
+    <div class="topic-title"><span>02</span> AI駆動ドキュメンテーション</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">AI駆動開発を進めるうえで、AIが読み取りやすいドキュメントを事前に準備する必要があります。フリーフォーマットのメモではなく、構造化されたMarkdownで書く。この準備の質が実装フェーズの出力精度を左右します。</p>
+    <div class="callout">
+      <div class="callout-title">Tip</div>
+      <p>「仕様を先に書き、実装はその後」。この順番が核です。言語やフレームワークに依存しない普遍的な考え方で、JavaでもTypeScriptでも同じ型が使えます。あるべき姿を先に示すことで、AIの出力精度が上がります。</p>
+    </div>
+  </div>
+
+  <!-- 仕様駆動開発 -->
+  <div class="topic">
+    <div class="topic-title"><span>03</span> 仕様駆動開発</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">仕様を書かずにいきなりコードを書かせると、AIは「動くが使えないもの」を量産します。メモから要件を抽出し、Markdownで構造化し、仕様書にまとめる。この工程を経てから実装に入ると手戻りが激減します。</p>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-num"><span class="reveal-num" onclick="this.classList.toggle('is-revealed')">73%</span></div>
+        <div class="stat-label">開発の手戻りの原因が<br>上流工程の不備<br><a href="https://www.nist.gov/system/files/documents/director/planning/report02-3.pdf" target="_blank" class="source-badge">NIST 2002 調査</a></div>
+      </div>
+      <div class="stat">
+        <div class="stat-num"><span class="reveal-num" onclick="this.classList.toggle('is-revealed')">3日</span></div>
+        <div class="stat-label">仕様不備1件あたりの<br>平均修正コスト</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num"><span class="reveal-num" onclick="this.classList.toggle('is-revealed')">1/5</span></div>
+        <div class="stat-label">仕様書があるときの<br>AI出力修正回数比</div>
+      </div>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">メモから仕様書を作るとき、ありがちな失敗</div>
+      <p>メモの箇条書きをそのままAIに渡して「仕様書にして」と頼むと、AIが親切心で勝手に要件を追加します。ログイン機能、通知機能、権限管理など、メモに根拠がない機能が混入するのが典型例です。「メモに書かれていない要件は追加しないでください」という制約を明示しないと、仕様書の段階でスコープが膨張し、手戻りの種になります。</p>
+    </div>
+
+    <!-- デモ: 仕様駆動開発 -->
+    <button class="demo-btn" onclick="openModal('demo-spec')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      デモ : メモから仕様書を作成する
+    </button>
+  </div>
+
+  <!-- コメントドリブン開発 -->
+  <div class="topic">
+    <div class="topic-title"><span>04</span> コメントドリブン開発</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">「こういう使い方もある」という紹介です。関数の上にコメントを先に書き、Copilotにそのコメントからコード補完させる手法。仕様駆動開発の考え方をコードレベルに落とし込んだものと言えます。</p>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># 部門ごとの月別売上合計を算出する</span>
+<span class="comment"># 引数: DataFrame（売上データ）</span>
+<span class="comment"># 戻り値: 部門×年月の集計DataFrame</span>
+<span class="comment"># pandasのメソッドチェーンを使用する</span>
+<span class="kw">def</span> <span class="key">aggregate_dept_monthly</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
+    <span class="comment"># Copilotがコメントを読んで本体を補完する</span></div>
+    <div class="callout">
+      <div class="callout-title">Tip</div>
+      <p>型ヒントとコメントを書いてからTabキーを押す。Copilotは関数名・型ヒント・コメントの3つから本体を推測します。Agent MDで「型ヒント必須」と設定してある場合、この精度がさらに上がります。詳しい補完の活用法は <a href="https://docs.github.com/en/copilot/using-github-copilot/getting-code-suggestions-in-your-ide-with-github-copilot" target="_blank">GitHub Copilot コード補完ガイド</a> を参照してください。</p>
+    </div>
+  </div>
+
+  <!-- ハンズオン1: 仕様書作成 -->
+  <div class="handson-block">
+    <div class="handson-header">
+      <div class="handson-badge">HANDS-ON</div>
+      <div class="handson-title">仕様書作成ハンズオン（25分）</div>
+    </div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:20px">議事メモから要件を抽出し、Markdown仕様書に構造化します。制約指示の効果を自分の手で試してください。</p>
+
+    <div class="material-dl">
+      <div class="material-dl-title">素材ダウンロード</div>
+      <button class="try-download-btn" onclick="downloadFile('議事メモ_データ分析案件.md',HANDSON_MEMO)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        議事メモ_データ分析案件.md
+      </button>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">1</div>
+      <div class="handson-step-body">
+        <strong>議事メモを読む（2分）</strong>
+        <p><code>docs/議事メモ_データ分析案件.md</code> を開いてください。営業企画部から開発チームへの依頼内容が書かれています。この1枚のメモが今日の全ての出発点です。</p>
+      </div>
+    </div>
+    <div class="handson-step">
+      <div class="handson-step-num">2</div>
+      <div class="handson-step-body">
+        <strong>要件を抽出する（8分）</strong>
+        <p>Copilot Chat（Ctrl+Shift+I）を開き、以下のように指示してください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="key">#file:</span><span class="str">docs/議事メモ_データ分析案件.md</span>
+
+この議事メモからユーザーストーリーを抽出してください。
+メモに書かれていない要件は追加しないでください。</div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">ここが肝</div>
+      <p>「追加しないで」の一文がないとAIは親切心で勝手に要件を足します。認証機能やログ出力など、メモに根拠がない機能が混ざる。気になる要件があれば「これはメモのどこに根拠がありますか?」と問い返してください。</p>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">3</div>
+      <div class="handson-step-body">
+        <strong>仕様書に構造化する（10分）</strong>
+        <p>抽出した要件をもとに、仕様書を作成します。以下のプロンプトを使ってください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">上記の要件をもとに、以下の構成でMarkdown仕様書を作成してください。
+- 機能一覧（テーブル形式）
+- データ構造（入力CSVのカラム定義）
+- 出力仕様（出力ファイル名、カラム構成）
+- 処理フロー（箇条書き）</div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">出力をプロジェクトルートに <code>spec.md</code> として保存してください。</p>
+
+    <div class="handson-step">
+      <div class="handson-step-num">4</div>
+      <div class="handson-step-body">
+        <strong>Git commit する（5分）</strong>
+        <p>研修の最初にフォルダで <code>git init</code> を実行してから、仕様書をcommitします。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">git add spec.md
+git commit -m "議事メモから仕様書を作成"</div>
+
+    <div class="callout">
+      <div class="callout-title">制約指示がないとどうなるか</div>
+      <p>制約なしで「この議事メモから要件を整理して」とだけ伝えると、AIは以下のような要件を勝手に追加しがちです。</p>
+      <p style="margin-top:8px">
+        ・ユーザー認証機能（メモに認証の話は一切ない）<br>
+        ・メール通知機能（誰も頼んでいない）<br>
+        ・ダッシュボードUI（CLIで十分なのにWebアプリにする）<br>
+        ・多言語対応（国内業務なのに英語対応を入れる）
+      </p>
+      <p style="margin-top:8px">AIの「親切な追加」は仕様書のスコープを膨張させます。「メモに書かれていない要件は追加しないで」の一文が防波堤になります。</p>
+    </div>
+
+    <div class="callout callout-handson">
+      <div class="callout-title">確認ポイント</div>
+      <p>制約指示があるときとないときで出力がどう変わるか。隣の人と仕様書を見比べてみてください。同じメモから始めても、粒度や構成が違っているはずです。</p>
+    </div>
+  </div>
+
+  <div class="sources">
+    <div class="sources-title">Session 02 参考リンク</div>
+    <ul class="sources-list">
+      <li><a href="https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-chat-in-your-ide" target="_blank">GitHub Copilot Chat ドキュメント</a></li>
+      <li><a href="https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions-for-github-copilot" target="_blank">copilot-instructions.md 公式ガイド</a></li>
+      <li><a href="https://simonwillison.net/2025/Jun/27/context-engineering/" target="_blank">Context Engineering 解説（Simon Willison）</a></li>
+      <li><a href="https://github.blog/developer-skills/github/how-to-use-github-copilot-in-your-ide-tips-tricks-and-best-practices/" target="_blank">GitHub Copilot Tips &amp; Best Practices</a></li>
+      <li><a href="https://docs.github.com/en/copilot/using-github-copilot/getting-code-suggestions-in-your-ide-with-github-copilot" target="_blank">GitHub Copilot コード補完ガイド</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- SESSION 03 : Agent MD + 実装 + テスト -->
+<!-- ========================================================================== -->
+<div class="section" id="session03">
+  <div class="section-num">Session 03</div>
+  <div class="section-title">Agent MD + 実装 + テスト</div>
+  <p class="section-lead">先方から最も強い要望があったテーマです。copilot-instructions.md でCopilotの出力品質をチーム単位で制御する方法を学び、Session 02で作った仕様書と組み合わせて実際に動くアプリを作ります。</p>
+
+  <!-- Agent MDの設計 -->
+  <div class="topic">
+    <div class="topic-title"><span>01</span> Agent MD とは何か</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px"><code>.github/copilot-instructions.md</code> というファイルをリポジトリに置くと、そのリポジトリでGitHub Copilotを使う全員がこのルールに従った出力を得ます。個人設定ではなくチーム設定です。</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">パスを間違えると一切効きません</div>
+      <p>よくある失敗は <code>github/copilot-instructions.md</code>（ドット抜け）や <code>.github/copilot/instructions.md</code>（余計なサブフォルダ）。正しいパスは <code>.github/copilot-instructions.md</code> です。リポジトリルート直下に <code>.github</code> フォルダを作り、その直下にファイルを置いてください。Windowsのエクスプローラーは先頭がドットのフォルダを作りにくいので、ターミナルから <code>mkdir .github</code> で作るのが確実です。</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">書くべきカテゴリ 1</div>
+        <h4>コーディング規約</h4>
+        <p>言語バージョン、型ヒントの要否、docstringスタイル、命名規則。チーム全員が日常的に守っているルールをそのまま書きます。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">書くべきカテゴリ 2</div>
+        <h4>推奨パターン</h4>
+        <p>pandasのメソッドチェーン、Pathlibでのファイルパス操作、pd.to_datetime()による日付処理。チームで「この書き方がいい」と合意しているものを列挙します。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">書くべきカテゴリ 3</div>
+        <h4>禁止事項</h4>
+        <p>bare except禁止、print()デバッグ禁止、SQL文字列結合禁止、グローバル変数禁止。禁止事項が最も効きます。Copilotはここに書かれたことを守ります。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">書くべきカテゴリ 4</div>
+        <h4>出力フォーマット</h4>
+        <p>CSVの文字コード、数値のフォーマット、日付形式。出力に関する決め事を書いておくと、生成コードが最初から正しい形式で出力します。</p>
+      </div>
+    </div>
+
+    <button class="reveal-btn" data-label="Agent MD テンプレート全文" onclick="revealSection(this)">Agent MD テンプレート全文</button>
+    <div class="instructor-reveal">
+      <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># Copilot Instructions</span>
+
+<span class="comment">## 言語・バージョン</span>
+- Python 3.12
+- 標準ライブラリとpandasを使用
+
+<span class="comment">## コーディング規約</span>
+- 型ヒントを必ず付ける
+- docstringはGoogle Styleで書く
+- 変数名・関数名は英語
+- コメントは日本語で書く
+
+<span class="comment">## 推奨パターン</span>
+- pandasではメソッドチェーンを使う
+- ファイルパスはPathlibを使う
+- 日付処理はpd.to_datetime()を使う
+
+<span class="comment">## 禁止事項</span>
+- bare except（except: のみ）は禁止。必ず例外型を指定する
+- print()でのデバッグは禁止。loggingモジュールを使う
+- SQL文字列の直接結合は禁止。パラメータ化クエリを使う
+- グローバル変数の使用は禁止
+
+<span class="comment">## 出力フォーマット</span>
+- CSVの文字コードはUTF-8（BOM付き）
+- 数値は桁区切りなし
+- 日付フォーマットはYYYY-MM-DD</div>
+    </div>
+  </div>
+
+  <!-- 比較デモ -->
+  <div class="topic">
+    <div class="topic-title"><span>02</span> Agent MD の適用前後を比較する</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">同じ指示を出しても、Agent MDの有無で出力がまるで変わります。ここが研修で最もインパクトがあるパートです。</p>
+
+    <button class="demo-btn" onclick="openModal('demo-agentmd')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      デモ : Agent MD 適用前後の比較
+    </button>
+
+    <button class="reveal-btn" data-label="出力の差を見る" onclick="revealSection(this)">出力の差を見る</button>
+    <div class="instructor-reveal">
+      <div class="tbl-wrap">
+      <table>
+        <tr><th>観点</th><th>Agent MD なし</th><th>Agent MD あり</th></tr>
+        <tr><td>型ヒント</td><td>なし</td><td class="highlight">全関数に付与</td></tr>
+        <tr><td>docstring</td><td>なし or 不統一</td><td class="highlight">Google Style で統一</td></tr>
+        <tr><td>変数名</td><td>日本語混じり</td><td class="highlight">英語で統一</td></tr>
+        <tr><td>コメント言語</td><td>英語</td><td class="highlight">日本語</td></tr>
+        <tr><td>例外処理</td><td>bare except あり</td><td class="highlight">例外型を指定</td></tr>
+        <tr><td>デバッグ出力</td><td>print() 使用</td><td class="highlight">logging 使用</td></tr>
+        <tr><td>ファイルパス</td><td>文字列連結</td><td class="highlight">Pathlib 使用</td></tr>
+      </table>
+      </div>
+      <p style="font-size:.88rem;color:var(--gray-700);margin-top:12px">「設定しないで使う」と「設定して使う」の差がこれです。同じツールでも使い方で生産性が変わります。</p>
+    </div>
+  </div>
+
+  <!-- テストコード生成 -->
+  <div class="topic">
+    <div class="topic-title"><span>03</span> テストコード生成</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">Copilotはテストコードの生成も得意です。pytestを使ったテスト生成を、ミニアプリ開発ハンズオンの中で体験します。</p>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># Copilot Chat に渡すプロンプト例</span>
+<span class="key">#file:</span><span class="str">analyze.py</span>
+
+このファイルの各関数に対して、pytestのテストを書いてください。
+- 正常系と異常系（空データ、欠損あり）を含めてください。
+- テストデータはフィクスチャで用意してください。</div>
+    <div class="callout">
+      <div class="callout-title">Tip</div>
+      <p>テスト対象のファイルを #file: で渡すのがコツです。Copilotが関数シグネチャと型ヒントを読み取り、それに合ったテストケースを生成します。Agent MDで型ヒント必須にしてあると、テスト生成の精度も上がります。</p>
+    </div>
+
+    <button class="reveal-btn" data-label="pytest フィクスチャの代表パターン" onclick="revealSection(this)">pytest フィクスチャの代表パターン</button>
+    <div class="instructor-reveal">
+      <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">Copilotが生成するテストコードでよく使われるフィクスチャパターンです。テスト結果を読み解く際の参考にしてください。</p>
+      <div class="code-block" style="white-space:pre;line-height:1.6"><span class="kw">import</span> pytest
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="comment"># テストデータを共通化するフィクスチャ</span>
+<span class="key">@pytest.fixture</span>
+<span class="kw">def</span> <span class="key">sample_df</span>() -&gt; pd.DataFrame:
+    <span class="kw">return</span> pd.DataFrame({
+        <span class="str">"部門"</span>: [<span class="str">"営業"</span>, <span class="str">"営業"</span>, <span class="str">"開発"</span>],
+        <span class="str">"売上金額"</span>: [100000, 200000, 150000],
+    })
+
+<span class="comment"># 空データを渡す異常系テスト</span>
+<span class="key">@pytest.fixture</span>
+<span class="kw">def</span> <span class="key">empty_df</span>() -&gt; pd.DataFrame:
+    <span class="kw">return</span> pd.DataFrame(columns=[<span class="str">"部門"</span>, <span class="str">"売上金額"</span>])
+
+<span class="kw">def</span> <span class="key">test_aggregate_normal</span>(sample_df):
+    result = aggregate_sales_by_dept(sample_df)
+    <span class="kw">assert</span> len(result) == 2  <span class="comment"># 営業と開発の2行</span>
+
+<span class="kw">def</span> <span class="key">test_aggregate_empty</span>(empty_df):
+    result = aggregate_sales_by_dept(empty_df)
+    <span class="kw">assert</span> result.empty</div>
+    </div>
+  </div>
+
+  <!-- ハンズオン2: Agent MD作成 -->
+  <div class="handson-block">
+    <div class="handson-header">
+      <div class="handson-badge">HANDS-ON</div>
+      <div class="handson-title">Agent MD 作成ハンズオン（20分）</div>
+    </div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:20px">テンプレートをベースに、自チームの実態に合わせた copilot-instructions.md を作成します。</p>
+
+    <div class="material-dl">
+      <div class="material-dl-title">素材ダウンロード</div>
+      <button class="try-download-btn" onclick="downloadFile('copilot-instructions.md',HANDSON_AGENTMD)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        copilot-instructions.md（テンプレート）
+      </button>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">1</div>
+      <div class="handson-step-body">
+        <strong>テンプレートを確認する（3分）</strong>
+        <p><code>templates/copilot-instructions.md</code> を開いてください。ここに書かれたルールがCopilotへの常駐指示になります。</p>
+      </div>
+    </div>
+    <div class="handson-step">
+      <div class="handson-step-num">2</div>
+      <div class="handson-step-body">
+        <strong>自チーム用に編集して配置する（10分）</strong>
+        <p>.github フォルダを作成し、テンプレートをコピーして編集してください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># Windows の場合</span>
+mkdir .github
+copy templates\copilot-instructions.md .github\copilot-instructions.md
+
+<span class="comment"># Mac/Linux の場合</span>
+mkdir -p .github
+cp templates/copilot-instructions.md .github/copilot-instructions.md</div>
+
+    <div class="callout">
+      <div class="callout-title">編集で考えること</div>
+      <p>自チームで使っている言語・バージョンは合っているか。追加したいコーディング規約はあるか。チーム内で「この書き方はやめてほしい」と思っているものはあるか。テンプレートはあくまでたたき台です。自分たちの実態に合わせて編集してください。</p>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">3</div>
+      <div class="handson-step-body">
+        <strong>効果を確認する（5分）</strong>
+        <p>新しい Copilot Chat を開いて以下を指示してください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">CSVファイルを読み込んで、部門ごとの売上合計を集計する関数を書いて</div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">出力に型ヒントが付いているか、docstringがGoogle Styleか、変数名が英語になっているか確認してください。</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">Agent MDが反映されない場合</div>
+      <p>ファイルパスが <code>.github/copilot-instructions.md</code> になっているか確認してください（サブフォルダに作っていないか）。既存のチャットには反映されないことがあるので、新しいチャットで試してください。それでもダメなら Ctrl+Shift+P から「Reload Window」を実行します。</p>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">4</div>
+      <div class="handson-step-body">
+        <strong>Git commit する（2分）</strong>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">git add .github/copilot-instructions.md
+git commit -m "自チーム用Agent MDを追加"</div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">成果物: 実務のリポジトリにそのまま持ち帰れる copilot-instructions.md</p>
+  </div>
+
+  <!-- ハンズオン3: ミニアプリ開発 -->
+  <div class="handson-block">
+    <div class="handson-header">
+      <div class="handson-badge">HANDS-ON</div>
+      <div class="handson-title">ミニアプリ開発 + AIレビュー ハンズオン（40分）</div>
+    </div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:20px">Session 02で作った仕様書と、直前に作ったAgent MDを使い、動くPythonアプリを作ります。上流から下流まで全部繋がる瞬間です。</p>
+
+    <div class="material-dl">
+      <div class="material-dl-title">素材ダウンロード</div>
+      <button class="try-download-btn" onclick="downloadFile('sales_data.csv',HANDSON_CSV)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        sales_data.csv（サンプルデータ）
+      </button>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">1</div>
+      <div class="handson-step-body">
+        <strong>素材を確認する（2分）</strong>
+        <p>以下の3つが揃っていることを確認してください。</p>
+      </div>
+    </div>
+    <ul class="check-list" style="margin-bottom:16px">
+      <li><code>spec.md</code> : ハンズオン1で作成した仕様書</li>
+      <li><code>.github/copilot-instructions.md</code> : ハンズオン2で作成したAgent MD</li>
+      <li><code>data/sales_data.csv</code> : サンプルデータ（配布済み）</li>
+    </ul>
+
+    <div class="handson-step">
+      <div class="handson-step-num">2</div>
+      <div class="handson-step-body">
+        <strong>実装する（15分）</strong>
+        <p>Copilot Chatを開き、仕様書を参照させて実装を指示してください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="key">#file:</span><span class="str">spec.md</span> の仕様に従って、data/sales_data.csv を読み込み、
+以下の集計を行うPythonスクリプト analyze.py を作成してください。
+
+1. 部門別の月別売上集計
+2. 地域別の売上構成比
+3. 売上上位10商品のランキング
+
+結果はそれぞれCSVファイルとして output/ に出力してください。
+欠損データ（空の値）は除外して集計してください。</div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">出力を <code>analyze.py</code> として保存し、実行してください。</p>
+    <div class="code-block" style="white-space:pre;line-height:1.6">python analyze.py</div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">エラーが出たら</div>
+      <p>エラーメッセージをそのままCopilot Chatに貼り付けて修正を依頼してください。それが実務でもやる正しい使い方です。「pandas が見つからない」なら <code>pip install pandas</code>、「output/ がない」なら Copilot がコードに <code>Path("output").mkdir(exist_ok=True)</code> を追加してくれます。</p>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">3</div>
+      <div class="handson-step-body">
+        <strong>テストコードを生成する（5分）</strong>
+        <p>完成した analyze.py に対して pytest のテストを書かせてみてください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="key">#file:</span><span class="str">analyze.py</span>
+
+この関数群に対して、pytestのテストを書いてください。
+正常系と、空のDataFrameを渡した場合のテストを含めてください。</div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">4</div>
+      <div class="handson-step-body">
+        <strong>AIにレビューさせる（10分）</strong>
+        <p>完成した analyze.py を全選択し、以下をCopilot Chatに指示してください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">このコードをレビューしてください。
+- エラーハンドリングは適切か
+- パフォーマンスに問題はないか
+- .github/copilot-instructions.md の規約に準拠しているか</div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">AIの指摘を読んで、対応が必要と判断したものだけ修正してください。全ての指摘に従う必要はありません。判断するのは人間の役割です。</p>
+
+    <div class="handson-step">
+      <div class="handson-step-num">5</div>
+      <div class="handson-step-body">
+        <strong>Git commit する（3分）</strong>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">git add analyze.py output/
+git commit -m "売上分析ミニアプリを実装"</div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">よくあるエラーと対処法</div>
+      <p style="margin-bottom:8px"><code>ModuleNotFoundError: No module named 'pandas'</code><br>
+      pandas がインストールされていません。<code>pip install pandas</code> を実行してください。仮想環境を使っている場合は、その環境がアクティブか確認してください。</p>
+      <p style="margin-bottom:8px"><code>FileNotFoundError: [Errno 2] No such file or directory: 'data/sales_data.csv'</code><br>
+      スクリプトの実行ディレクトリが違います。<code>cd</code> でプロジェクトルートに移動してから再実行してください。VS Codeのターミナルを使っていれば、通常はプロジェクトルートが作業ディレクトリになっています。</p>
+      <p><code>UnicodeDecodeError: 'utf-8' codec can't decode byte ...</code><br>
+      CSVの文字コードが合っていません。<code>pd.read_csv(path, encoding="cp932")</code> に変えてみてください。BOM付きUTF-8の場合は <code>encoding="utf-8-sig"</code> を使います。</p>
+    </div>
+
+    <div class="callout callout-handson">
+      <div class="callout-title">詰まったとき</div>
+      <p>15分経っても動かない場合は講師にお声がけください。フォールバック用のコードを配布します。全員が「動くもの」を持ち帰れることが最優先です。自力で書けなくても、動くコードを持ってAIレビューの体験に進めればOKです。</p>
+    </div>
+  </div>
+
+  <div class="sources">
+    <div class="sources-title">Session 03 参考リンク</div>
+    <ul class="sources-list">
+      <li><a href="https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions-for-github-copilot" target="_blank">copilot-instructions.md 公式ガイド</a></li>
+      <li><a href="https://docs.github.com/en/copilot/using-github-copilot/code-review/using-copilot-code-review" target="_blank">GitHub Copilot Code Review</a></li>
+      <li><a href="https://docs.pytest.org/en/stable/" target="_blank">pytest 公式ドキュメント</a></li>
+      <li><a href="https://pandas.pydata.org/docs/user_guide/index.html" target="_blank">pandas ユーザーガイド</a></li>
+      <li><a href="https://google.github.io/styleguide/pyguide.html" target="_blank">Google Python Style Guide</a></li>
+      <li><a href="https://docs.github.com/en/copilot/using-github-copilot/using-agent-mode-in-github-copilot" target="_blank">GitHub Copilot Agent Mode ドキュメント</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- SESSION 04 : まとめと今後の展望 -->
+<!-- ========================================================================== -->
+<div class="section" id="session04">
+  <div class="section-num">Session 04</div>
+  <div class="section-title">まとめと今後の展望</div>
+  <p class="section-lead">今日の研修を振り返り、明日から使えるアクションと、エンジニアのこれからを考えます。</p>
+
+  <!-- 振り返り -->
+  <div class="topic">
+    <div class="topic-title"><span>01</span> 研修の振り返り</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">メモ1枚から始めて、仕様書を構造化し、Agent MDでCopilotの出力品質を制御し、動くアプリを実装し、AIにレビューさせてcommitする。この一連のフローを自分の手で完走しました。</p>
+    <div class="flow">
+      <div class="flow-step">メモ</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">仕様書</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">Agent MD</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">実装</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">テスト</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step">AIレビュー</div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-step is-active">commit</div>
+    </div>
+  </div>
+
+  <!-- 持ち帰り物 -->
+  <div class="topic">
+    <div class="topic-title"><span>02</span> 持ち帰り物の確認</div>
+    <ul class="check-list">
+      <li><code>spec.md</code> -- 構造化された仕様書テンプレートとして再利用可能</li>
+      <li><code>.github/copilot-instructions.md</code> -- そのままチームのリポジトリに投入可能</li>
+      <li><code>analyze.py</code> -- 動くPythonミニアプリ</li>
+      <li>「メモ → 仕様書 → Agent MD → 実装 → テスト → AIレビュー → commit」のフロー理解</li>
+    </ul>
+
+    <div class="callout callout-handson">
+      <div class="callout-title">明日からやること</div>
+      <p>1. copilot-instructions.md をチームのリポジトリに入れる（最もコストが低く効果が高い一手）<br>
+      2. 新しい開発は「仕様を書く → AIに実装させる」の順番を守る<br>
+      3. AIが書いたコードをAIレビュー + 人間判断にかける</p>
+    </div>
+  </div>
+
+  <!-- バイブコーディング -->
+  <div class="topic">
+    <div class="topic-title"><span>03</span> バイブコーディングという潮流</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">「こう動いてほしい」という雰囲気（バイブ）だけをAIに伝えてコードを書かせる手法です。<a href="https://x.com/karpathy/status/1886192184808149383" target="_blank">Andrej Karpathy氏が2025年2月にXで命名</a>し、一気に広まりました。プロトタイプやPoCの段階では有効ですが、本番開発にそのまま持ち込むと品質リスクが跳ね上がります。今日学んだ「仕様駆動 + Agent MD」はバイブコーディングの対極にある堅実なアプローチで、両方を使い分けるのが現実的です。</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>観点</th><th>バイブコーディング</th><th>仕様駆動 + Agent MD</th></tr>
+      <tr><td>速度</td><td class="highlight">高速（思いつきで開始）</td><td>準備に時間がかかる</td></tr>
+      <tr><td>品質</td><td>不安定（AIまかせ）</td><td class="highlight">安定（規約で制御）</td></tr>
+      <tr><td>再現性</td><td>属人的（プロンプト依存）</td><td class="highlight">チーム共有可能</td></tr>
+      <tr><td>適する場面</td><td>PoC、プロトタイプ、個人開発</td><td class="highlight">業務アプリ、チーム開発</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- 他の生成AIツール -->
+  <div class="topic">
+    <div class="topic-title"><span>04</span> 他の生成AI開発ツール</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">GitHub Copilot以外にも、AI駆動開発を加速するツールが増えています。深入りはしませんが、存在を知っておくことに価値があります。</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="tool-icon" style="background:#D97706">Claude Code</div>
+        <div class="card-label">CLI ベースのAI開発ツール</div>
+        <h4><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank">Claude Code</a></h4>
+        <p>VS Codeにも組み込み可能なCLI開発ツール。copilot-instructions.md の設計思想の源流です。CLAUDE.md というプロジェクトルールファイルでAIの振る舞いを制御します。</p>
+      </div>
+      <div class="card">
+        <div class="tool-icon" style="background:#7C3AED">Cursor</div>
+        <div class="card-label">VS Code 派生 AI IDE</div>
+        <h4><a href="https://www.cursor.com/" target="_blank">Cursor</a></h4>
+        <p>VS Codeをフォークした専用IDE。コードベース全体を理解した上でのコード生成が特徴。多くの開発者が日常的に使い始めています。</p>
+      </div>
+      <div class="card">
+        <div class="tool-icon" style="background:#FF9900">Kiro</div>
+        <div class="card-label">AWS 発 AI IDE</div>
+        <h4><a href="https://kiro.dev/" target="_blank">Kiro</a></h4>
+        <p>AWSが開発したVS Code派生のAI IDE。仕様駆動のアプローチを重視しており、今日学んだ考え方と親和性が高いツールです。</p>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+    <table class="tool-compare-tbl">
+      <tr><th>ツール</th><th>提供元</th><th>料金目安（個人/月）</th><th>対応言語</th><th>特徴</th></tr>
+      <tr>
+        <td class="highlight">GitHub Copilot</td><td>GitHub / Microsoft</td><td>$10 / Pro</td>
+        <td>全主要言語</td><td>VS Code統合、Agent MD、コードレビュー。エンタープライズ向け管理機能が充実</td>
+      </tr>
+      <tr>
+        <td class="highlight">Claude Code</td><td>Anthropic</td><td>API従量課金</td>
+        <td>全主要言語</td><td>CLI完結。CLAUDE.mdによる指示設計。ファイル操作やGit操作も自律実行</td>
+      </tr>
+      <tr>
+        <td class="highlight">Cursor</td><td>Anysphere</td><td>$20 / Pro</td>
+        <td>全主要言語</td><td>VS Codeベースの専用IDE。コードベース全体を理解した上での生成が強み</td>
+      </tr>
+      <tr>
+        <td class="highlight">Kiro</td><td>AWS</td><td>無料 / Pro $19</td>
+        <td>全主要言語</td><td>仕様駆動開発を重視。Spec→Design→Implementの順序を仕組み化</td>
+      </tr>
+    </table>
+    </div>
+    <p style="font-size:.75rem;color:var(--gray-500);margin-top:4px">料金は2026年3月時点の参考値です。最新の料金体系は各公式サイトで確認してください。</p>
+  </div>
+
+  <!-- エンジニアの未来 -->
+  <div class="topic">
+    <div class="topic-title"><span>05</span> 3年後、エンジニアは何をしているか</div>
+
+    <div class="disc">
+      <div class="disc-q">生成AIで開発手法がどう変わっていくか。何を追いかけなければならないか。</div>
+      <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:8px">まずは皆さんで考えてみてください。</p>
+      <button class="disc-toggle" onclick="toggleDisc(this)">回答</button>
+      <div class="disc-answer">
+        <div class="disc-point" style="margin-top:14px">
+          <h5>コードを書く量は減り、設計と判断の密度が上がる</h5>
+          <p>AIがコードを書く部分はどんどん増えます。人間の仕事は「何を作るか決める」「AIの出力が正しいか判断する」「設計をレビューする」に集中していきます。今日体験した「仕様を書く→AIに実装させる→人間が判断する」のサイクルは、3年後にはさらに当たり前になっているはずです。</p>
+        </div>
+        <div class="disc-point">
+          <h5>追うべきはツールではなく設計思想</h5>
+          <p>GitHub Copilotが3年後にどうなっているかはわかりません。別のツールが主流になっているかもしれません。ただ、「AIに正しい文脈を渡す」「仕様を先に書く」「規約でAIの出力を制御する」という設計思想はツールに依存しません。今日学んだことは、ツールが変わっても使えます。</p>
+        </div>
+        <div class="disc-point">
+          <h5>Pythonの活用幅が広がる</h5>
+          <p>業務で必要になったデータ変換、集計ツール、ちょっとした自動化。今日の研修で体験した手法があれば、これまで依頼していた作業を自分で素早く作れるようになります。AIを使いこなせるエンジニアは、対応できる仕事の範囲が大きく広がります。</p>
+        </div>
+        <div class="disc-point">
+          <h5>GitHub自体が進化を続けている</h5>
+          <p>GitHub Copilot Workspace（Issue→Plan→Implement→PRを自動化する構想）や、Agent Modeの拡張、Copilot Extensionsによるサードパーティ連携など、ロードマップは加速しています。ツールの機能追加を追いかけるより、今日学んだ「仕様を先に書き、Agent MDで制御し、人間が判断する」フレームワークを土台にしておけば、新機能が出ても使いこなし方の応用が利きます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 完了チェックリスト -->
+  <div class="topic">
+    <div class="topic-title"><span>06</span> 完了チェックリスト</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:12px">研修が終わった時点で、以下が揃っていれば成功です。</p>
+    <ul class="check-list">
+      <li><code>spec.md</code>（議事メモから作成した仕様書）</li>
+      <li><code>.github/copilot-instructions.md</code>（自チーム用Agent MD）</li>
+      <li><code>analyze.py</code>（動作するPythonスクリプト）</li>
+      <li><code>output/</code> 内に集計結果のCSVファイル</li>
+      <li><code>git log</code> で3回分のcommit履歴が見える</li>
+    </ul>
+  </div>
+
+  <div class="sources">
+    <div class="sources-title">Session 04 参考リンク</div>
+    <ul class="sources-list">
+      <li><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank">Claude Code ドキュメント</a></li>
+      <li><a href="https://www.cursor.com/" target="_blank">Cursor 公式サイト</a></li>
+      <li><a href="https://kiro.dev/" target="_blank">Kiro 公式サイト</a></li>
+      <li><a href="https://github.blog/news-insights/product-news/" target="_blank">GitHub Blog - Product News</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- 付録: 生成AI関連の資格 -->
+<!-- ========================================================================== -->
+<div class="section" id="appendix">
+  <div class="section-num">APPENDIX</div>
+  <div class="section-title">生成AI関連の資格・認定</div>
+  <p class="section-lead">今日の研修で学んだ内容をさらに深めたい方、客観的なスキル証明が欲しい方に向けて、関連する資格を紹介します。受験を強制するものではございません。キャリアの方向性に合わせて、興味があるものを検討してみてください。</p>
+
+  <div class="topic">
+    <div class="topic-title"><span>01</span> 今日の研修内容と直結する資格</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="tool-icon" style="background:#1A1A1A">GitHub</div>
+        <div class="card-label">本研修と最も関連が深い</div>
+        <h4><a href="https://learn.microsoft.com/ja-jp/credentials/certifications/github-copilot/" target="_blank">GitHub Copilot Certification（GH-300）</a></h4>
+        <p>GitHub Copilotの活用能力を認定する公式資格。プロンプトエンジニアリング、責任あるAIの使用、各プランの機能差、プライバシー保護まで出題されます。2026年1月に試験内容が大幅改訂され、日本語での受験にも対応済み。今日学んだ copilot-instructions.md やコンテキスト設計の知識がそのまま活きます。</p>
+        <p style="font-size:.78rem;color:var(--gray-500);margin-top:8px">受験料 $99 / 選択式 60問 120分 / オンライン監督付き / 合格ライン 70%前後</p>
+      </div>
+      <div class="card">
+        <div class="tool-icon" style="background:#1A1A1A">GitHub</div>
+        <div class="card-label">Git/GitHub の基礎固めに</div>
+        <h4><a href="https://resources.github.com/ja/learn/certifications/" target="_blank">GitHub Foundations</a></h4>
+        <p>GitHubの基本概念、リポジトリ管理、コラボレーション機能の理解を問う入門資格。今日の研修で git init / commit の流れを体験しましたが、ブランチ戦略やPull Requestなど、チーム開発に必要な知識を体系的に押さえたい場合に有効です。</p>
+        <p style="font-size:.78rem;color:var(--gray-500);margin-top:8px">受験料 $99 / 選択式 75問 120分 / オンライン監督付き / 合格ライン 70%前後</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-title"><span>02</span> 国内の生成AI資格</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">非エンジニアでも受けやすい</div>
+        <h4><a href="https://guga.or.jp/outline/" target="_blank">生成AIパスポート試験</a></h4>
+        <p>生成AI活用普及協会（GUGA）が運営する国内資格。2026年から年5回開催に拡大されました。最新シラバスではGPT-o1/o3、Claude、Copilot、RAG、AIエージェント、AI新法まで範囲が広がっています。生成AIの全体像を体系的に掴みたい方の入口として手堅い選択肢です。</p>
+        <p style="font-size:.78rem;color:var(--gray-500);margin-top:8px">受験料 11,000円(税込) / 4択 60問 60分 / オンライン / 合格率 約70%</p>
+      </div>
+      <div class="card">
+        <div class="card-label">実装力を証明する最高峰</div>
+        <h4><a href="https://www.jdla.org/certificate/engineer/" target="_blank">JDLA E資格</a></h4>
+        <p>日本ディープラーニング協会が主催するエンジニア向けの国内最難関AI資格。ディープラーニングの理論と実装能力を問います。今回の研修テーマとは直接重ならない領域ですが、AIの仕組みを深く理解したいエンジニアには価値があります。JDLA認定プログラムの修了が受験の前提条件になっている点に注意してください。</p>
+        <p style="font-size:.78rem;color:var(--gray-500);margin-top:8px">受験料 33,000円(税込) / 選択式+記述 約100問 120分 / 会場 / 合格率 約60-70%</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-title"><span>03</span> クラウドベンダーのAI認定</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">AWSやAzureを業務で使っているなら、クラウドベンダーのAI認定がキャリアの武器になります。今日の研修で扱ったAI駆動開発の考え方と、クラウド上でのAIサービス構築は補完関係にあります。</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>資格名</th><th>提供元</th><th>レベル</th><th>特徴</th></tr>
+      <tr>
+        <td class="highlight"><a href="https://aws.amazon.com/jp/certification/certified-ai-practitioner/" target="_blank">AWS Certified AI Practitioner</a></td>
+        <td>AWS</td>
+        <td>入門</td>
+        <td>AI/ML/生成AIの概念とAWSのAIサービスの基礎知識を問う。Lambda/Glueなど既に使っている方は学習コストが低い</td>
+      </tr>
+      <tr>
+        <td class="highlight"><a href="https://learn.microsoft.com/ja-jp/credentials/certifications/azure-ai-fundamentals/" target="_blank">Azure AI Fundamentals（AI-900）</a></td>
+        <td>Microsoft</td>
+        <td>入門</td>
+        <td>Azure AI サービスの基礎。受験料12,500円。随時受験可能で取得しやすい</td>
+      </tr>
+      <tr>
+        <td class="highlight"><a href="https://cloud.google.com/learn/certification/cloud-ml-engineer" target="_blank">Google Cloud ML Engineer</a></td>
+        <td>Google Cloud</td>
+        <td>上級</td>
+        <td>ML実装能力を問う国際資格。Vertex AI、BigQuery MLなどGoogle Cloudでの実務経験が前提</td>
+      </tr>
+    </table>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">どの資格から始めるか</div>
+      <p>今日の研修内容と最も直結するのは GitHub Copilot Certification です。日常業務でCopilotを使い続けながら準備すれば、特別な学習なしでも合格圏に入れます。AWSを業務で使っているなら AWS AI Practitioner も費用対効果が高い選択肢になります。国内資格では生成AIパスポートが間口が広く、チームメンバーに勧めやすいでしょう。</p>
+    </div>
+  </div>
+
+  <div class="sources">
+    <div class="sources-title">資格・認定 参考リンク</div>
+    <ul class="sources-list">
+      <li><a href="https://learn.microsoft.com/ja-jp/credentials/certifications/github-copilot/" target="_blank">GitHub Copilot Certification 公式</a></li>
+      <li><a href="https://resources.github.com/ja/learn/certifications/" target="_blank">GitHub 認定資格一覧</a></li>
+      <li><a href="https://guga.or.jp/outline/" target="_blank">生成AIパスポート試験（GUGA）</a></li>
+      <li><a href="https://www.jdla.org/certificate/engineer/" target="_blank">JDLA E資格</a></li>
+      <li><a href="https://aws.amazon.com/jp/certification/certified-ai-practitioner/" target="_blank">AWS Certified AI Practitioner</a></li>
+      <li><a href="https://learn.microsoft.com/ja-jp/credentials/certifications/azure-ai-fundamentals/" target="_blank">Azure AI Fundamentals</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+  <p>VS Code × GitHub Copilot AI駆動開発研修 | 2026年3月</p>
+  <p style="margin-top:4px">Powered by Givery, Inc.</p>
+</footer>
+
+<!-- ========================================================================== -->
+<!-- モーダル群 -->
+<!-- ========================================================================== -->
+
+<!-- デモ: メモから仕様書 -->
+<div class="modal-overlay" id="demo-spec">
+<div class="modal">
+  <div class="modal-header">
+    <h3>デモ : メモから仕様書を作成する</h3>
+    <button class="modal-close" onclick="closeModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-tabs">
+      <button class="modal-tab is-active" onclick="switchTab(this,'spec')">本筋デモ</button>
+      <button class="modal-tab" onclick="switchTab(this,'spec')">発展</button>
+    </div>
+    <div class="modal-panel is-active" data-group="spec">
+      <h4>議事メモ → 要件抽出 → Markdown仕様書</h4>
+      <p>フリーフォーマットのメモからGitHub Copilotで要件を抽出し、構造化された仕様書に変換する流れを見ます。</p>
+      <div class="demo-step">
+        <div class="demo-step-num">1</div>
+        <div class="demo-step-body">
+          <strong>議事メモを開く</strong>
+          <p>VS Codeで docs/議事メモ_データ分析案件.md を開きます。営業企画部と開発チームの打ち合わせメモです。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">2</div>
+        <div class="demo-step-body">
+          <strong>制約付きで要件を抽出</strong>
+          <p>Copilot Chatに #file: で議事メモを渡し、「メモに書かれていない要件は追加しないで」の制約をつけてユーザーストーリーを抽出させます。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">3</div>
+        <div class="demo-step-body">
+          <strong>制約なしバージョンと比較</strong>
+          <p>同じメモを制約なしで抽出させ、出力を比較します。AIが根拠なく追加した要件がどこにあるか指摘します。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">4</div>
+        <div class="demo-step-body">
+          <strong>仕様書に構造化</strong>
+          <p>抽出した要件を「機能一覧（テーブル）、データ構造、出力仕様、処理フロー」の構成でMarkdown仕様書に変換します。spec.md として保存します。</p>
+        </div>
+      </div>
+      <div class="try-section">
+        <div class="try-section-title">自分で試す</div>
+        <div class="try-prompt">
+          <div class="try-prompt-label">プロンプト（要件抽出）</div>
+          <div class="try-prompt-code" id="prompt-spec1">#file:docs/議事メモ_データ分析案件.md
+
+この議事メモからユーザーストーリーを抽出してください。
+メモに書かれていない要件は追加しないでください。</div>
+          <button class="try-copy-btn" onclick="copyText('prompt-spec1')">コピー</button>
+        </div>
+        <div class="try-prompt">
+          <div class="try-prompt-label">プロンプト（仕様書構造化）</div>
+          <div class="try-prompt-code" id="prompt-spec2">上記の要件をもとに、以下の構成でMarkdown仕様書を作成してください。
+- 機能一覧（テーブル形式）
+- データ構造（入力CSVのカラム定義）
+- 出力仕様（出力ファイル名、カラム構成）
+- 処理フロー（箇条書き）</div>
+          <button class="try-copy-btn" onclick="copyText('prompt-spec2')">コピー</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-panel" data-group="spec">
+      <div class="adv-tag">発展コンテンツ</div>
+      <h4>仕様書からファイル構成を生成する</h4>
+      <p>仕様書ができたら、さらにプロジェクトのディレクトリ構成や各ファイルの責務を生成させることもできます。</p>
+      <div class="demo-step">
+        <div class="demo-step-num">1</div>
+        <div class="demo-step-body">
+          <strong>ファイル構成を提案させる</strong>
+          <p>#file:spec.md を渡して「Pythonプロジェクトのディレクトリ構成を提案してください」と指示します。各ファイルの役割と依存関係が返ってきます。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">2</div>
+        <div class="demo-step-body">
+          <strong>「AIに任せるための地図」の完成</strong>
+          <p>仕様書 + ディレクトリ構成が揃えば、ここから先の実装をAIに任せるための地図ができたことになります。この工程は言語に依存しません。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- デモ: Agent MD比較 -->
+<div class="modal-overlay" id="demo-agentmd">
+<div class="modal">
+  <div class="modal-header">
+    <h3>デモ : Agent MD 適用前後の比較</h3>
+    <button class="modal-close" onclick="closeModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-tabs">
+      <button class="modal-tab is-active" onclick="switchTab(this,'agentmd')">本筋デモ</button>
+      <button class="modal-tab" onclick="switchTab(this,'agentmd')">発展</button>
+    </div>
+    <div class="modal-panel is-active" data-group="agentmd">
+      <h4>設定の有無で出力品質がどう変わるか</h4>
+      <p>同じプロンプトに対して、Agent MDがある場合とない場合の出力を並べて比較します。</p>
+      <div class="demo-step">
+        <div class="demo-step-num">1</div>
+        <div class="demo-step-body">
+          <strong>Agent MDを一時的に無効化</strong>
+          <p>.github/copilot-instructions.md を一時リネームして無効にします。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">2</div>
+        <div class="demo-step-body">
+          <strong>指示を出して出力を確認</strong>
+          <p>「CSVファイルを読み込んで、部門ごとの売上合計を集計する関数を書いて」と指示。型ヒントなし、docstringなし、print()デバッグありの出力が出ます。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">3</div>
+        <div class="demo-step-body">
+          <strong>Agent MDを戻して同じ指示</strong>
+          <p>copilot-instructions.md を戻し、新しいチャットで同じ指示を出します。型ヒント付き、Google Style docstring、logging使用の出力に変わります。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">4</div>
+        <div class="demo-step-body">
+          <strong>テストコード生成</strong>
+          <p>Agent MDが効いた状態で、生成した関数に対してpytestのテストを書かせます。型ヒントがあるとテスト生成の精度も上がります。</p>
+        </div>
+      </div>
+      <div class="try-section">
+        <div class="try-section-title">自分で試す</div>
+        <div class="try-prompt">
+          <div class="try-prompt-label">プロンプト</div>
+          <div class="try-prompt-code" id="prompt-agentmd">CSVファイルを読み込んで、部門ごとの売上合計を集計する関数を書いて</div>
+          <button class="try-copy-btn" onclick="copyText('prompt-agentmd')">コピー</button>
+        </div>
+        <button class="try-download-btn" onclick="downloadFile('sales_sample.csv',DEMO_CSV)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          サンプルCSVをダウンロード
+        </button>
+      </div>
+    </div>
+    <div class="modal-panel" data-group="agentmd">
+      <div class="adv-tag">発展コンテンツ</div>
+      <h4>Copilotの最新制御機能</h4>
+      <p>Agent MD以外にも、Copilotの出力を制御する方法があります。</p>
+      <div class="demo-step">
+        <div class="demo-step-num">1</div>
+        <div class="demo-step-body">
+          <strong>@workspace コマンド</strong>
+          <p>リポジトリ全体を文脈に含めます。大規模プロジェクトで関連ファイルを自動的に参照させたい場合に使います。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">2</div>
+        <div class="demo-step-body">
+          <strong>#file: コマンド</strong>
+          <p>特定ファイルを明示的に文脈に含めます。仕様書や設定ファイルを渡すときに使います。</p>
+        </div>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-num">3</div>
+        <div class="demo-step-body">
+          <strong>インラインチャット（Ctrl+I）</strong>
+          <p>選択範囲に対して直接操作します。リファクタリング、説明、テスト生成を選択範囲に絞って実行できます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- JavaScript -->
+<!-- ========================================================================== -->
+<script>
+/* モーダル */
+function openModal(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add('is-open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  var overlays=document.querySelectorAll('.modal-overlay.is-open');
+  overlays.forEach(function(o){o.classList.remove('is-open')});
+  document.body.style.overflow='';
+}
+function switchTab(btn,group){
+  var tabs=btn.parentElement;
+  var body=tabs.parentElement;
+  var allTabs=tabs.querySelectorAll('.modal-tab');
+  var allPanels=body.querySelectorAll('.modal-panel[data-group="'+group+'"]');
+  var idx=Array.prototype.indexOf.call(allTabs,btn);
+  allTabs.forEach(function(t){t.classList.remove('is-active')});
+  allPanels.forEach(function(p){p.classList.remove('is-active')});
+  btn.classList.add('is-active');
+  if(allPanels[idx])allPanels[idx].classList.add('is-active');
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeModal();
+});
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('modal-overlay'))closeModal();
+});
+
+/* 目アイコンSVG定数 */
+var EYE='<svg class="eye-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+var EYE_OFF='<svg class="eye-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+/* 初期アイコンセット */
+(function(){
+  document.querySelectorAll('.reveal-btn').forEach(function(el){
+    el.innerHTML=(el.getAttribute('data-label')||'詳細')+' '+EYE;
+  });
+  document.querySelectorAll('.disc-toggle').forEach(function(el){
+    el.innerHTML='回答 '+EYE;
+  });
+  var b=document.getElementById('toggleAllBtn');
+  if(b) b.innerHTML='全表示 '+EYE;
+})();
+
+/* 全表示トグル */
+var allRevealed=false;
+function toggleAll(){
+  allRevealed=!allRevealed;
+  document.querySelectorAll('.reveal-num').forEach(function(el){
+    if(allRevealed) el.classList.add('is-revealed');
+    else el.classList.remove('is-revealed');
+  });
+  document.querySelectorAll('.disc-answer').forEach(function(el){
+    if(allRevealed) el.classList.add('is-open');
+    else el.classList.remove('is-open');
+  });
+  document.querySelectorAll('.disc-toggle').forEach(function(el){
+    if(allRevealed){el.classList.add('is-open');el.innerHTML='回答 '+EYE_OFF;}
+    else{el.classList.remove('is-open');el.innerHTML='回答 '+EYE;}
+  });
+  document.querySelectorAll('.instructor-reveal').forEach(function(el){
+    if(allRevealed) el.classList.add('is-open');
+    else el.classList.remove('is-open');
+  });
+  document.querySelectorAll('.reveal-btn').forEach(function(el){
+    var label=el.getAttribute('data-label')||'詳細';
+    if(allRevealed){el.classList.add('is-open');el.innerHTML=label+' '+EYE_OFF;}
+    else{el.classList.remove('is-open');el.innerHTML=label+' '+EYE;}
+  });
+  var btn=document.getElementById('toggleAllBtn');
+  if(btn){
+    btn.innerHTML=allRevealed?'全非表示 '+EYE_OFF:'全表示 '+EYE;
+    btn.classList.toggle('is-active',allRevealed);
+  }
+}
+
+/* ディスカッション回答の個別トグル */
+function toggleDisc(btn){
+  var answer=btn.nextElementSibling;
+  if(!answer)return;
+  btn.classList.toggle('is-open');
+  answer.classList.toggle('is-open');
+  btn.innerHTML=answer.classList.contains('is-open')?'回答 '+EYE_OFF:'回答 '+EYE;
+}
+
+/* 段階開示の個別トグル */
+function revealSection(btn){
+  var target=btn.nextElementSibling;
+  if(!target)return;
+  btn.classList.toggle('is-open');
+  target.classList.toggle('is-open');
+  var label=btn.getAttribute('data-label')||'詳細';
+  btn.innerHTML=target.classList.contains('is-open')?label+' '+EYE_OFF:label+' '+EYE;
+}
+
+/* プロンプトコピー */
+function copyText(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  navigator.clipboard.writeText(el.textContent).then(function(){
+    var btn=el.parentElement.querySelector('.try-copy-btn');
+    if(btn){btn.textContent='OK';setTimeout(function(){btn.textContent='コピー'},1500)}
+  });
+}
+
+/* ダミーデータダウンロード */
+function downloadFile(name,content){
+  var blob=new Blob([content],{type:'text/plain;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+/* サンプルCSVデータ（デモモーダル用・既存） */
+var DEMO_CSV='日付,部門,商品カテゴリ,商品名,数量,単価,売上金額,地域,担当者\n2025-09-02,営業一部,ソフトウェア,業務管理パッケージ Standard,2,150000,300000,関東,田中太郎\n2025-09-03,営業二部,ハードウェア,ノートPC 標準モデル,5,120000,600000,関西,伊藤美咲\n2025-09-04,法人営業部,サービス,導入コンサルティング,1,200000,200000,関東,吉田隆\n2025-09-05,営業三部,消耗品,トナーカートリッジ 黒,20,8500,170000,中部,小林誠\n2025-09-08,営業一部,ハードウェア,モニター 27インチ 4K,8,58000,464000,関東,高橋花子\n2025-09-09,営業二部,ソフトウェア,データ分析ツール Enterprise,1,420000,420000,関西,山本大輔\n2025-09-10,法人営業部,ハードウェア,ノートPC 高性能モデル,3,198000,594000,関東,松本恵\n2025-09-11,営業一部,消耗品,コピー用紙 A4 5000枚,15,3200,48000,東北,渡辺健一\n2025-09-12,営業三部,サービス,年間保守サポート Basic,2,60000,120000,関東,加藤裕子\n2025-09-16,営業二部,ソフトウェア,セキュリティスイート,3,98000,294000,九州,中村友紀\n';
+
+/* ===== ハンズオン素材データ ===== */
+
+/* 議事メモ（Session 02 ハンズオン1） */
+var HANDSON_MEMO = '# 議事メモ：データ分析案件\n\n' +
+'## 会議情報\n- 日時：2025年8月28日 14:00-15:00\n- 参加者：営業企画部 鈴木部長、開発チーム 佐藤リーダー\n- 場所：第3会議室\n\n' +
+'## 背景\n営業企画部では各部門の売上データをExcelで手作業集計している。\n月次報告のたびに3日かかっている。自動化したい。\n\n' +
+'## やりたいこと\n- 売上CSVを読み込んで部門別・月別に集計したい\n- 地域ごとの売上構成比も出したい\n- 売上上位10商品のランキングを出したい\n- 結果はCSVで出力してほしい（Excelで開ける形式）\n- 欠損データ（空の値）は除外して集計してほしい\n\n' +
+'## データについて\n- CSVファイル。カラムは「日付, 部門, 商品カテゴリ, 商品名, 数量, 単価, 売上金額, 地域, 担当者」\n- 月に1回、基幹システムからエクスポートしている\n- だいたい500〜1000行/月\n- たまに空の行や欠損がある\n\n' +
+'## 制約・要望\n- Python で作ってほしい（社内標準）\n- 特別なDBは使わない。CSVの読み書きだけで完結させたい\n- 実行はコマンドラインから。GUIは不要\n- 鈴木部長「来月の月次報告（9月末）までに使いたい」\n\n' +
+'## 次のアクション\n- 佐藤：仕様書を作成して鈴木部長にレビュー依頼（9/5まで）\n- 鈴木：サンプルCSVを1ファイル提供（9/3まで）\n';
+
+/* Agent MD テンプレート（Session 03 ハンズオン2） */
+var HANDSON_AGENTMD = '# Copilot Instructions\n\n' +
+'## 言語・バージョン\n- Python 3.12\n- 標準ライブラリとpandasを使用\n\n' +
+'## コーディング規約\n- 型ヒントを必ず付ける\n- docstringはGoogle Styleで書く\n- 変数名・関数名は英語\n- コメントは日本語で書く\n\n' +
+'## 推奨パターン\n- pandasではメソッドチェーンを使う\n- ファイルパスはPathlibを使う\n- 日付処理はpd.to_datetime()を使う\n\n' +
+'## 禁止事項\n- bare except（except: のみ）は禁止。必ず例外型を指定する\n- print()でのデバッグは禁止。loggingモジュールを使う\n- SQL文字列の直接結合は禁止。パラメータ化クエリを使う\n- グローバル変数の使用は禁止\n\n' +
+'## 出力フォーマット\n- CSVの文字コードはUTF-8（BOM付き）\n- 数値は桁区切りなし\n- 日付フォーマットはYYYY-MM-DD\n';
+
+/* 売上データCSV（Session 03 ハンズオン3、30行） */
+var HANDSON_CSV = '\ufeff' +
+'日付,部門,商品カテゴリ,商品名,数量,単価,売上金額,地域,担当者\n' +
+'2025-09-01,営業一部,ソフトウェア,業務管理パッケージ Standard,2,150000,300000,関東,田中太郎\n' +
+'2025-09-02,営業二部,ハードウェア,ノートPC 標準モデル,5,120000,600000,関西,伊藤美咲\n' +
+'2025-09-03,法人営業部,サービス,導入コンサルティング,1,200000,200000,関東,吉田隆\n' +
+'2025-09-04,営業三部,消耗品,トナーカートリッジ 黒,20,8500,170000,中部,小林誠\n' +
+'2025-09-05,営業一部,ハードウェア,モニター 27インチ 4K,8,58000,464000,関東,高橋花子\n' +
+'2025-09-08,営業二部,ソフトウェア,データ分析ツール Enterprise,1,420000,420000,関西,山本大輔\n' +
+'2025-09-09,法人営業部,ハードウェア,ノートPC 高性能モデル,3,198000,594000,関東,松本恵\n' +
+'2025-09-10,営業一部,消耗品,コピー用紙 A4 5000枚,15,3200,48000,東北,渡辺健一\n' +
+'2025-09-11,営業三部,サービス,年間保守サポート Basic,2,60000,120000,関東,加藤裕子\n' +
+'2025-09-12,営業二部,ソフトウェア,セキュリティスイート,3,98000,294000,九州,中村友紀\n' +
+'2025-09-16,営業一部,ハードウェア,サーバー ラックマウント 1U,1,350000,350000,関東,田中太郎\n' +
+'2025-09-17,営業二部,消耗品,トナーカートリッジ カラー4色セット,10,12000,120000,関西,伊藤美咲\n' +
+'2025-09-18,法人営業部,ソフトウェア,業務管理パッケージ Professional,1,280000,280000,関東,吉田隆\n' +
+'2025-09-19,営業三部,ハードウェア,デスクトップPC 標準モデル,4,95000,380000,中部,小林誠\n' +
+'2025-09-22,営業一部,サービス,導入コンサルティング,2,200000,400000,関東,高橋花子\n' +
+'2025-09-23,営業二部,ハードウェア,ノートPC 標準モデル,3,120000,360000,関西,山本大輔\n' +
+'2025-09-24,法人営業部,消耗品,コピー用紙 A4 5000枚,20,3200,64000,関東,松本恵\n' +
+'2025-09-25,営業一部,ソフトウェア,セキュリティスイート,5,98000,490000,東北,渡辺健一\n' +
+'2025-09-26,営業三部,ハードウェア,モニター 27インチ 4K,6,58000,348000,関東,加藤裕子\n' +
+'2025-09-29,営業二部,サービス,年間保守サポート Premium,1,180000,180000,九州,中村友紀\n' +
+'2025-09-30,営業一部,ハードウェア,ノートPC 高性能モデル,2,198000,396000,関東,田中太郎\n' +
+'2025-10-01,法人営業部,ソフトウェア,データ分析ツール Enterprise,2,420000,840000,関東,吉田隆\n' +
+'2025-10-02,営業二部,消耗品,トナーカートリッジ 黒,15,8500,127500,関西,伊藤美咲\n' +
+'2025-10-03,営業三部,ハードウェア,サーバー ラックマウント 1U,1,350000,350000,中部,小林誠\n' +
+'2025-10-06,営業一部,サービス,年間保守サポート Basic,3,60000,180000,関東,高橋花子\n' +
+'2025-10-07,営業二部,ソフトウェア,業務管理パッケージ Standard,4,150000,600000,関西,山本大輔\n' +
+'2025-10-08,法人営業部,ハードウェア,デスクトップPC 標準モデル,2,95000,190000,関東,松本恵\n' +
+'2025-10-09,,消耗品,コピー用紙 A3 2500枚,10,4500,45000,東北,渡辺健一\n' +
+'2025-10-10,営業三部,ハードウェア,ノートPC 標準モデル,,,0,関東,加藤裕子\n';
+
+/* ===== ZIP生成（ストアモード・外部ライブラリ不要） ===== */
+function buildZip(files) {
+  /* files: [{name: string, content: string}] */
+  var encoder = new TextEncoder();
+  var centralDir = [];
+  var localParts = [];
+  var offset = 0;
+
+  for (var i = 0; i < files.length; i++) {
+    var nameBytes = encoder.encode(files[i].name);
+    var dataBytes = encoder.encode(files[i].content);
+
+    /* CRC-32 */
+    var crc = crc32(dataBytes);
+
+    /* Local file header (30 + name + data) */
+    var local = new Uint8Array(30 + nameBytes.length + dataBytes.length);
+    var lv = new DataView(local.buffer);
+    lv.setUint32(0, 0x04034b50, true);   /* signature */
+    lv.setUint16(4, 20, true);            /* version needed */
+    lv.setUint16(6, 0x0800, true);        /* general purpose bit flag: UTF-8 */
+    lv.setUint16(8, 0, true);             /* compression: store */
+    lv.setUint16(10, 0, true);            /* mod time */
+    lv.setUint16(12, 0x5821, true);       /* mod date (2024-01-01) */
+    lv.setUint32(14, crc, true);          /* crc-32 */
+    lv.setUint32(18, dataBytes.length, true); /* compressed size */
+    lv.setUint32(22, dataBytes.length, true); /* uncompressed size */
+    lv.setUint16(26, nameBytes.length, true); /* file name length */
+    lv.setUint16(28, 0, true);            /* extra field length */
+    local.set(nameBytes, 30);
+    local.set(dataBytes, 30 + nameBytes.length);
+    localParts.push(local);
+
+    /* Central directory header */
+    var cdir = new Uint8Array(46 + nameBytes.length);
+    var cv = new DataView(cdir.buffer);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0x0800, true);        /* UTF-8 flag */
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0x5821, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, dataBytes.length, true);
+    cv.setUint32(24, dataBytes.length, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0x20, true);         /* external file attributes */
+    cv.setUint32(42, offset, true);       /* relative offset of local header */
+    cdir.set(nameBytes, 46);
+    centralDir.push(cdir);
+
+    offset += local.length;
+  }
+
+  /* End of central directory */
+  var cdirSize = centralDir.reduce(function(s, c) { return s + c.length; }, 0);
+  var eocd = new Uint8Array(22);
+  var ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, files.length, true);
+  ev.setUint16(10, files.length, true);
+  ev.setUint32(12, cdirSize, true);
+  ev.setUint32(16, offset, true);
+  ev.setUint16(20, 0, true);
+
+  /* Concat all */
+  var total = offset + cdirSize + 22;
+  var zip = new Uint8Array(total);
+  var pos = 0;
+  for (var j = 0; j < localParts.length; j++) {
+    zip.set(localParts[j], pos);
+    pos += localParts[j].length;
+  }
+  for (var k = 0; k < centralDir.length; k++) {
+    zip.set(centralDir[k], pos);
+    pos += centralDir[k].length;
+  }
+  zip.set(eocd, pos);
+  return zip;
+}
+
+/* CRC-32 */
+var crc32Table = null;
+function crc32(bytes) {
+  if (!crc32Table) {
+    crc32Table = new Uint32Array(256);
+    for (var i = 0; i < 256; i++) {
+      var c = i;
+      for (var j = 0; j < 8; j++) {
+        c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      }
+      crc32Table[i] = c;
+    }
+  }
+  var crc = 0xFFFFFFFF;
+  for (var k = 0; k < bytes.length; k++) {
+    crc = crc32Table[(crc ^ bytes[k]) & 0xFF] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+/* ZIP一括ダウンロード */
+function downloadZip() {
+  var files = [
+    { name: 'dis-handson/docs/議事メモ_データ分析案件.md', content: HANDSON_MEMO },
+    { name: 'dis-handson/templates/copilot-instructions.md', content: HANDSON_AGENTMD },
+    { name: 'dis-handson/data/sales_data.csv', content: HANDSON_CSV }
+  ];
+  var zipData = buildZip(files);
+  var blob = new Blob([zipData], { type: 'application/zip' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'dis-handson-materials.zip';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
