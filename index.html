@@ -438,11 +438,26 @@ td.highlight{color:var(--accent);font-weight:600}
 @media print{
   .site-header{position:static}
   .card:hover,.agenda-card:hover{transform:none;box-shadow:none}
-  .demo-btn,.toggle-all-btn,.disc-toggle,.reveal-btn,.zip-download-btn,.try-download-btn{display:none}
+  .demo-btn,.toggle-all-btn,.disc-toggle,.reveal-btn,.zip-download-btn,.try-download-btn,.try-copy-btn{display:none}
   .modal-overlay{display:none !important}
   .reveal-num{filter:none !important}
   .disc-answer,.instructor-reveal{max-height:none !important;overflow:visible !important}
-  .try-section,.material-dl,.prep-actions{display:none}
+  .try-section,.material-dl{display:none}
+  .prep-actions{display:none}
+  .prep-card{padding:20px}
+  .prep-section{padding-bottom:16px}
+  .hero{padding:40px 24px 24px}
+  .section{padding:40px 24px}
+  .agenda{padding-bottom:24px}
+  .topic{margin-bottom:24px}
+  .section-title{break-after:avoid}
+  .section-num{break-after:avoid}
+  .topic-title{break-after:avoid}
+  .handson-header{break-after:avoid}
+  .callout{break-inside:avoid}
+  .code-block{break-inside:avoid}
+  .stat-grid{break-inside:avoid}
+  .flow{break-inside:avoid}
 }
 </style>
 </head>
@@ -470,27 +485,20 @@ td.highlight{color:var(--accent);font-weight:600}
 <div class="hero">
   <div class="hero-badge">HANDS-ON TRAINING</div>
   <h1>VS Code × <span>GitHub Copilot</span><br>AI駆動開発研修</h1>
-  <p class="hero-sub">メモ1枚から仕様書、Agent MD、動くアプリ、AIレビューまで。上流から下流を一気通貫で体験する4時間。</p>
+  <p class="hero-sub">メモ1枚から仕様書、Agent MD、Copilot制御まで。上流工程の設計力とAI活用力を身につける4.5時間。</p>
   <div class="hero-meta">
     <div class="hero-meta-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
         <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
       </svg>
-      2026年3月
+      2026年4月18日（金）
     </div>
     <div class="hero-meta-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
       </svg>
-      4時間
-    </div>
-    <div class="hero-meta-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-      6-7名
+      9:30 - 15:00（4.5時間）
     </div>
     <div class="hero-meta-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -507,12 +515,13 @@ td.highlight{color:var(--accent);font-weight:600}
   <div class="prep-card">
     <div class="prep-card-title">環境準備</div>
     <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:12px">研修を始める前に、以下の環境が整っていることをご確認ください。ハンズオンで使う素材は一括でダウンロードできます。</p>
-    <ul class="check-list">
-      <li>VS Code 最新版がインストールされている</li>
+    <ul class="check-list" style="margin-top:4px">
+      <li style="display:list-item;visibility:visible">VS Code 最新版がインストールされている</li>
       <li>GitHub Copilot 拡張機能が有効（右下アイコンが青色）</li>
       <li>Python 3.11以上が動作する（<code>python --version</code>）</li>
       <li>Git がインストールされている（<code>git --version</code>）</li>
       <li>pandas がインストールされている（<code>pip install pandas</code>）</li>
+      <li>pytest がインストールされている（<code>pip install pytest</code>）</li>
     </ul>
     <div class="prep-actions">
       <button class="zip-download-btn" onclick="downloadZip()">
@@ -536,41 +545,33 @@ td.highlight{color:var(--accent);font-weight:600}
       <div class="agenda-time">00:00</div>
       <div class="agenda-body">
         <h3>Session 01 : オープニング<span class="agenda-dur">10分</span></h3>
-        <p>研修ゴールと全体マップ / 環境チェック / GitHub Copilotの基本操作確認</p>
+        <p>研修ゴールと全体マップ / 環境チェック / GitHub Copilotの基本操作確認 / AI駆動開発の全体像</p>
       </div>
     </a>
     <a href="#session02" class="agenda-card" style="text-decoration:none;color:inherit">
       <div class="agenda-time">00:10</div>
       <div class="agenda-body">
-        <h3>Session 02 : コンテキスト設計と仕様駆動開発<span class="agenda-dur">80分</span></h3>
-        <p>コンテキストエンジニアリング / 上流工程でのAI活用 / 仕様書作成ハンズオン</p>
+        <h3>Session 02 : コンテキスト設計と仕様駆動開発<span class="agenda-dur">100分</span></h3>
+        <p>設計思想（文脈設計・仕様駆動） / ライブデモ（要件抽出・Markdown構造化・コメントドリブン） / 仕様書作成演習</p>
       </div>
     </a>
-    <div class="agenda-card is-break">
-      <div class="agenda-time">01:30</div>
-      <div class="agenda-body"><h3>休憩<span class="agenda-dur">10分</span></h3></div>
-    </div>
     <a href="#session03" class="agenda-card" style="text-decoration:none;color:inherit">
-      <div class="agenda-time">01:40</div>
+      <div class="agenda-time">01:50</div>
       <div class="agenda-body">
-        <h3>Session 03 : Agent MD + 実装 + テスト<span class="agenda-dur">90分</span></h3>
-        <p>Agent MD設計 / 比較デモ / テストコード生成 / ミニアプリ開発ハンズオン</p>
+        <h3>Session 03 : Agent MD × GitHub Copilot制御<span class="agenda-dur">100分</span></h3>
+        <p>Agent MDの設計（4カテゴリ・最新制御手法） / 適用前後の比較 / 自チーム用MD作成ハンズオン</p>
       </div>
     </a>
-    <div class="agenda-card is-break">
-      <div class="agenda-time">03:10</div>
-      <div class="agenda-body"><h3>休憩<span class="agenda-dur">10分</span></h3></div>
-    </div>
     <a href="#session04" class="agenda-card" style="text-decoration:none;color:inherit">
-      <div class="agenda-time">03:20</div>
+      <div class="agenda-time">03:30</div>
       <div class="agenda-body">
-        <h3>Session 04 : まとめと今後の展望<span class="agenda-dur">30分</span></h3>
-        <p>振り返り / 他の生成AI開発ツール / バイブコーディング / エンジニアの3年後</p>
+        <h3>Session 04 : まとめと今後の展望<span class="agenda-dur">40分</span></h3>
+        <p>振り返り / バイブコーディング / 安全運用ガイド / Claude Code・Cursor・Kiro / エンジニアの3年後</p>
       </div>
     </a>
     <div class="agenda-card is-break">
-      <div class="agenda-time">03:50</div>
-      <div class="agenda-body"><h3>質疑応答 + 閉会<span class="agenda-dur">10分</span></h3></div>
+      <div class="agenda-time">04:10</div>
+      <div class="agenda-body"><h3>質疑応答 + 閉会<span class="agenda-dur">20分</span></h3></div>
     </div>
   </div>
 </div>
@@ -585,7 +586,7 @@ td.highlight{color:var(--accent);font-weight:600}
 
   <div class="topic">
     <div class="topic-title"><span>01</span> 研修のゴール</div>
-    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:20px">今日の4時間で「メモ1枚を起点に、仕様書を書き、Agent MDを整備し、動くアプリを作り、AIにレビューさせてcommitする」までの一連の開発フローを自分の手で体験します。持ち帰るのは3つの成果物と、それを支える「型」そのものです。</p>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:20px">今日の4.5時間で「メモ1枚を起点に、仕様書を書き、Agent MDを整備し、GitHub Copilotの出力品質をチーム単位で制御する」までの一連の設計フローを自分の手で体験します。持ち帰るのは構造化された仕様書とAgent MD、そしてそれを支える「型」そのものです。</p>
     <div class="flow">
       <div class="flow-step is-active">議事メモ</div>
       <div class="flow-arrow">&#8594;</div>
@@ -595,14 +596,31 @@ td.highlight{color:var(--accent);font-weight:600}
       <div class="flow-arrow">&#8594;</div>
       <div class="flow-step">実装</div>
       <div class="flow-arrow">&#8594;</div>
-      <div class="flow-step">AIレビュー</div>
+      <div class="flow-step">テスト</div>
       <div class="flow-arrow">&#8594;</div>
-      <div class="flow-step">commit</div>
+      <div class="flow-step">AIレビュー</div>
     </div>
   </div>
 
   <div class="topic">
-    <div class="topic-title"><span>02</span> 環境チェック</div>
+    <div class="topic-title"><span>02</span> AI駆動開発の全体像</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">AI駆動開発とは、生成AIをコーディングアシスタントとして使うだけでなく、上流工程の設計段階からAIを組み込む開発手法です。</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">従来のAI活用</div>
+        <h4>コードを書かせる</h4>
+        <p>チャットで質問し、出力をコピペする。出力品質はプロンプトに依存し、毎回バラつきます。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">AI駆動開発</div>
+        <h4>文脈を設計して制御する</h4>
+        <p>仕様書やAgent MDで文脈を事前に構造化し、AIの出力を再現可能な形で安定させます。チーム全員の生産性が底上げされます。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-title"><span>03</span> 環境チェック</div>
     <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">以下の4つが動作する状態を確認してください。問題があれば講師にお声がけください。</p>
     <ul class="check-list">
       <li>VS Code 最新版がインストールされている</li>
@@ -610,6 +628,7 @@ td.highlight{color:var(--accent);font-weight:600}
       <li>Python 3.11以上が動作する（ターミナルで <code>python --version</code>）</li>
       <li>Git がインストールされている（ターミナルで <code>git --version</code>）</li>
       <li>pandas がインストールされている（<code>pip install pandas</code>）</li>
+      <li>pytest がインストールされている（<code>pip install pytest</code>）</li>
     </ul>
 
     <div class="callout">
@@ -624,7 +643,7 @@ td.highlight{color:var(--accent);font-weight:600}
   </div>
 
   <div class="topic">
-    <div class="topic-title"><span>03</span> GitHub Copilot の基本操作</div>
+    <div class="topic-title"><span>04</span> GitHub Copilot の基本操作</div>
     <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">本研修で使う3つの機能を確認します。</p>
     <div class="tbl-wrap">
     <table>
@@ -891,12 +910,12 @@ git commit -m "議事メモから仕様書を作成"</div>
 </div>
 
 <!-- ========================================================================== -->
-<!-- SESSION 03 : Agent MD + 実装 + テスト -->
+<!-- SESSION 03 : Agent MD × GitHub Copilot制御 -->
 <!-- ========================================================================== -->
 <div class="section" id="session03">
   <div class="section-num">Session 03</div>
-  <div class="section-title">Agent MD + 実装 + テスト</div>
-  <p class="section-lead">先方から最も強い要望があったテーマです。copilot-instructions.md でCopilotの出力品質をチーム単位で制御する方法を学び、Session 02で作った仕様書と組み合わせて実際に動くアプリを作ります。</p>
+  <div class="section-title">Agent MD × GitHub Copilot制御</div>
+  <p class="section-lead">先方から最も強い要望があったテーマです。copilot-instructions.md でCopilotの出力品質をチーム単位で制御する方法を学び、4カテゴリの設計指針、@/#等の最新制御手法、適用前後の差を体感します。自チーム用のAgent MDを作成して持ち帰ります。</p>
 
   <!-- Agent MDの設計 -->
   <div class="topic">
@@ -1024,47 +1043,23 @@ project-root/
     </div>
   </div>
 
-  <!-- テストコード生成 -->
+  <!-- 最新制御手法 -->
   <div class="topic">
-    <div class="topic-title"><span>03</span> テストコード生成</div>
-    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">Copilotはテストコードの生成も得意です。pytestを使ったテスト生成を、ミニアプリ開発ハンズオンの中で体験します。</p>
-    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># Copilot Chat に渡すプロンプト例</span>
-<span class="key">#file:</span><span class="str">analyze.py</span>
-
-このファイルの各関数に対して、pytestのテストを書いてください。
-- 正常系と異常系（空データ、欠損あり）を含めてください。
-- テストデータはフィクスチャで用意してください。</div>
+    <div class="topic-title"><span>03</span> @/# 等の最新制御手法</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">Agent MD以外にも、Copilotの出力を制御する手段があります。これらを組み合わせることで、文脈の精度をさらに高められます。</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>制御手法</th><th>記法</th><th>用途</th></tr>
+      <tr><td class="highlight">@workspace</td><td>チャット内で @workspace</td><td>リポジトリ全体を文脈に含める。大規模プロジェクトで関連ファイルを自動参照</td></tr>
+      <tr><td class="highlight">#file:</td><td>#file:ファイル名</td><td>特定ファイルを明示的に文脈に含める。仕様書や設定ファイルを渡すとき</td></tr>
+      <tr><td class="highlight">インラインチャット</td><td>Ctrl+I / Cmd+I</td><td>選択範囲に対して直接操作。リファクタリング、説明、テスト生成を範囲限定で実行</td></tr>
+      <tr><td class="highlight">Agent Mode</td><td>チャットでモード切替</td><td>自律的にファイル操作・ターミナル実行。AGENTS.mdで行動制約を定義</td></tr>
+      <tr><td class="highlight">.prompts/</td><td>.prompts/xxx.prompt.md</td><td>よく使うプロンプトをファイル化。チームで共有して品質を標準化</td></tr>
+    </table>
+    </div>
     <div class="callout">
       <div class="callout-title">Tip</div>
-      <p>テスト対象のファイルを #file: で渡すのがコツです。Copilotが関数シグネチャと型ヒントを読み取り、それに合ったテストケースを生成します。Agent MDで型ヒント必須にしてあると、テスト生成の精度も上がります。</p>
-    </div>
-
-    <button class="reveal-btn" data-label="pytest フィクスチャの代表パターン" onclick="revealSection(this)">pytest フィクスチャの代表パターン</button>
-    <div class="instructor-reveal">
-      <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">Copilotが生成するテストコードでよく使われるフィクスチャパターンです。テスト結果を読み解く際の参考にしてください。</p>
-      <div class="code-block" style="white-space:pre;line-height:1.6"><span class="kw">import</span> pytest
-<span class="kw">import</span> pandas <span class="kw">as</span> pd
-
-<span class="comment"># テストデータを共通化するフィクスチャ</span>
-<span class="key">@pytest.fixture</span>
-<span class="kw">def</span> <span class="key">sample_df</span>() -&gt; pd.DataFrame:
-    <span class="kw">return</span> pd.DataFrame({
-        <span class="str">"部門"</span>: [<span class="str">"営業"</span>, <span class="str">"営業"</span>, <span class="str">"開発"</span>],
-        <span class="str">"売上金額"</span>: [100000, 200000, 150000],
-    })
-
-<span class="comment"># 空データを渡す異常系テスト</span>
-<span class="key">@pytest.fixture</span>
-<span class="kw">def</span> <span class="key">empty_df</span>() -&gt; pd.DataFrame:
-    <span class="kw">return</span> pd.DataFrame(columns=[<span class="str">"部門"</span>, <span class="str">"売上金額"</span>])
-
-<span class="kw">def</span> <span class="key">test_aggregate_normal</span>(sample_df):
-    result = aggregate_sales_by_dept(sample_df)
-    <span class="kw">assert</span> len(result) == 2  <span class="comment"># 営業と開発の2行</span>
-
-<span class="kw">def</span> <span class="key">test_aggregate_empty</span>(empty_df):
-    result = aggregate_sales_by_dept(empty_df)
-    <span class="kw">assert</span> result.empty</div>
+      <p>#file: で仕様書を渡し、Agent MDでコーディング規約を効かせた状態でコード生成を指示する。この組み合わせが実務での基本形です。</p>
     </div>
   </div>
 
@@ -1137,118 +1132,14 @@ git commit -m "自チーム用Agent MDを追加"</div>
     <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">成果物: 実務のリポジトリにそのまま持ち帰れる copilot-instructions.md</p>
   </div>
 
-  <!-- ハンズオン3: ミニアプリ開発 -->
-  <div class="handson-block">
-    <div class="handson-header">
-      <div class="handson-badge">HANDS-ON</div>
-      <div class="handson-title">ミニアプリ開発 + AIレビュー ハンズオン（40分）</div>
-    </div>
-    <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:20px">Session 02で作った仕様書と、直前に作ったAgent MDを使い、動くPythonアプリを作ります。上流から下流まで全部繋がる瞬間です。</p>
-
-    <div class="material-dl">
-      <div class="material-dl-title">素材ダウンロード</div>
-      <button class="try-download-btn" onclick="downloadFile('sales_data.csv',HANDSON_CSV)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        sales_data.csv（サンプルデータ）
-      </button>
-    </div>
-
-    <div class="handson-step">
-      <div class="handson-step-num">1</div>
-      <div class="handson-step-body">
-        <strong>素材を確認する（2分）</strong>
-        <p>以下の3つが揃っていることを確認してください。</p>
-      </div>
-    </div>
-    <ul class="check-list" style="margin-bottom:16px">
-      <li><code>spec.md</code> : ハンズオン1で作成した仕様書</li>
-      <li><code>.github/copilot-instructions.md</code> : ハンズオン2で作成したAgent MD</li>
-      <li><code>data/sales_data.csv</code> : サンプルデータ（配布済み）</li>
-    </ul>
-
-    <div class="handson-step">
-      <div class="handson-step-num">2</div>
-      <div class="handson-step-body">
-        <strong>実装する（15分）</strong>
-        <p>Copilot Chatを開き、仕様書を参照させて実装を指示してください。</p>
-      </div>
-    </div>
-    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="key">#file:</span><span class="str">spec.md</span> の仕様に従って、data/sales_data.csv を読み込み、
-以下の集計を行うPythonスクリプト analyze.py を作成してください。
-
-1. 部門別の月別売上集計
-2. 地域別の売上構成比
-3. 売上上位10商品のランキング
-
-結果はそれぞれCSVファイルとして output/ に出力してください。
-欠損データ（空の値）は除外して集計してください。</div>
-    <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">出力を <code>analyze.py</code> として保存し、実行してください。</p>
-    <div class="code-block" style="white-space:pre;line-height:1.6">python analyze.py</div>
-
-    <div class="callout callout-warn">
-      <div class="callout-title">エラーが出たら</div>
-      <p>エラーメッセージをそのままCopilot Chatに貼り付けて修正を依頼してください。それが実務でもやる正しい使い方です。「pandas が見つからない」なら <code>pip install pandas</code>、「output/ がない」なら Copilot がコードに <code>Path("output").mkdir(exist_ok=True)</code> を追加してくれます。</p>
-    </div>
-
-    <div class="handson-step">
-      <div class="handson-step-num">3</div>
-      <div class="handson-step-body">
-        <strong>テストコードを生成する（5分）</strong>
-        <p>完成した analyze.py に対して pytest のテストを書かせてみてください。</p>
-      </div>
-    </div>
-    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="key">#file:</span><span class="str">analyze.py</span>
-
-この関数群に対して、pytestのテストを書いてください。
-正常系と、空のDataFrameを渡した場合のテストを含めてください。</div>
-
-    <div class="handson-step">
-      <div class="handson-step-num">4</div>
-      <div class="handson-step-body">
-        <strong>AIにレビューさせる（10分）</strong>
-        <p>完成した analyze.py を全選択し、以下をCopilot Chatに指示してください。</p>
-      </div>
-    </div>
-    <div class="code-block" style="white-space:pre;line-height:1.6">このコードをレビューしてください。
-- エラーハンドリングは適切か
-- パフォーマンスに問題はないか
-- .github/copilot-instructions.md の規約に準拠しているか</div>
-    <p style="font-size:.88rem;color:var(--gray-700);margin:12px 0">AIの指摘を読んで、対応が必要と判断したものだけ修正してください。全ての指摘に従う必要はありません。判断するのは人間の役割です。</p>
-
-    <div class="handson-step">
-      <div class="handson-step-num">5</div>
-      <div class="handson-step-body">
-        <strong>Git commit する（3分）</strong>
-      </div>
-    </div>
-    <div class="code-block" style="white-space:pre;line-height:1.6">git add analyze.py output/
-git commit -m "売上分析ミニアプリを実装"</div>
-
-    <div class="callout callout-warn">
-      <div class="callout-title">よくあるエラーと対処法</div>
-      <p style="margin-bottom:8px"><code>ModuleNotFoundError: No module named 'pandas'</code><br>
-      pandas がインストールされていません。<code>pip install pandas</code> を実行してください。仮想環境を使っている場合は、その環境がアクティブか確認してください。</p>
-      <p style="margin-bottom:8px"><code>FileNotFoundError: [Errno 2] No such file or directory: 'data/sales_data.csv'</code><br>
-      スクリプトの実行ディレクトリが違います。<code>cd</code> でプロジェクトルートに移動してから再実行してください。VS Codeのターミナルを使っていれば、通常はプロジェクトルートが作業ディレクトリになっています。</p>
-      <p><code>UnicodeDecodeError: 'utf-8' codec can't decode byte ...</code><br>
-      CSVの文字コードが合っていません。<code>pd.read_csv(path, encoding="cp932")</code> に変えてみてください。BOM付きUTF-8の場合は <code>encoding="utf-8-sig"</code> を使います。</p>
-    </div>
-
-    <div class="callout callout-handson">
-      <div class="callout-title">詰まったとき</div>
-      <p>15分経っても動かない場合は講師にお声がけください。フォールバック用のコードを配布します。全員が「動くもの」を持ち帰れることが最優先です。自力で書けなくても、動くコードを持ってAIレビューの体験に進めればOKです。</p>
-    </div>
-  </div>
 
   <div class="sources">
     <div class="sources-title">Session 03 参考リンク</div>
     <ul class="sources-list">
       <li><a href="https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions-for-github-copilot" target="_blank">copilot-instructions.md 公式ガイド</a></li>
-      <li><a href="https://docs.github.com/en/copilot/using-github-copilot/code-review/using-copilot-code-review" target="_blank">GitHub Copilot Code Review</a></li>
-      <li><a href="https://docs.pytest.org/en/stable/" target="_blank">pytest 公式ドキュメント</a></li>
-      <li><a href="https://pandas.pydata.org/docs/user_guide/index.html" target="_blank">pandas ユーザーガイド</a></li>
-      <li><a href="https://google.github.io/styleguide/pyguide.html" target="_blank">Google Python Style Guide</a></li>
       <li><a href="https://docs.github.com/en/copilot/using-github-copilot/using-agent-mode-in-github-copilot" target="_blank">GitHub Copilot Agent Mode ドキュメント</a></li>
+      <li><a href="https://docs.github.com/en/copilot/using-github-copilot/code-review/using-copilot-code-review" target="_blank">GitHub Copilot Code Review</a></li>
+      <li><a href="https://google.github.io/styleguide/pyguide.html" target="_blank">Google Python Style Guide</a></li>
     </ul>
   </div>
 </div>
@@ -1264,7 +1155,7 @@ git commit -m "売上分析ミニアプリを実装"</div>
   <!-- 振り返り -->
   <div class="topic">
     <div class="topic-title"><span>01</span> 研修の振り返り</div>
-    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">メモ1枚から始めて、仕様書を構造化し、Agent MDでCopilotの出力品質を制御し、動くアプリを実装し、AIにレビューさせてcommitする。この一連のフローを自分の手で完走しました。</p>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">メモ1枚から始めて、仕様書を構造化し、Agent MDでCopilotの出力品質をチーム単位で制御する。上流工程の設計力とAI活用力を自分の手で体験しました。</p>
     <div class="flow">
       <div class="flow-step">メモ</div>
       <div class="flow-arrow">&#8594;</div>
@@ -1288,8 +1179,8 @@ git commit -m "売上分析ミニアプリを実装"</div>
     <ul class="check-list">
       <li><code>spec.md</code> -- 構造化された仕様書テンプレートとして再利用可能</li>
       <li><code>.github/copilot-instructions.md</code> -- そのままチームのリポジトリに投入可能</li>
-      <li><code>analyze.py</code> -- 動くPythonミニアプリ</li>
-      <li>「メモ → 仕様書 → Agent MD → 実装 → テスト → AIレビュー → commit」のフロー理解</li>
+      <li><code>.github/</code> 配下の設定ファイル一式 -- instructions、AGENTS.md、skills、.prompts</li>
+      <li>「メモ → 仕様書 → Agent MD → 実装 → テスト → AIレビュー」のフロー理解</li>
     </ul>
 
     <div class="callout callout-handson">
@@ -1315,9 +1206,37 @@ git commit -m "売上分析ミニアプリを実装"</div>
     </div>
   </div>
 
+  <!-- 安全運用ガイド -->
+  <div class="topic">
+    <div class="topic-title"><span>04</span> 業務での安全運用ガイド</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">AI駆動開発を業務に持ち込む際に守るべきラインがあります。便利さに流されず、品質と安全を維持するための指針です。</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">原則 1</div>
+        <h4>AIの出力は必ず人間が検証する</h4>
+        <p>AIが生成したコードをそのまま本番に入れない。型チェック、テスト実行、コードレビューを経てからmergeする習慣を徹底してください。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">原則 2</div>
+        <h4>機密情報をAIに渡さない</h4>
+        <p>APIキー、パスワード、顧客データをプロンプトに含めない。.gitignoreに機密ファイルを登録し、Agent MDの禁止事項にも明記してください。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">原則 3</div>
+        <h4>AIの判断を鵜呑みにしない</h4>
+        <p>AIレビューの指摘に全て従う必要はありません。「この指摘は妥当か」を人間が判断する。判断力こそがエンジニアの本領です。</p>
+      </div>
+      <div class="card">
+        <div class="card-label">原則 4</div>
+        <h4>チームでルールを共有する</h4>
+        <p>Agent MDはチームのルールブック。個人の使い方に差が出ないよう、copilot-instructions.mdをリポジトリに入れてバージョン管理してください。</p>
+      </div>
+    </div>
+  </div>
+
   <!-- 他の生成AIツール -->
   <div class="topic">
-    <div class="topic-title"><span>04</span> 他の生成AI開発ツール</div>
+    <div class="topic-title"><span>05</span> 他の生成AI開発ツール</div>
     <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">GitHub Copilot以外にも、AI駆動開発を加速するツールが増えています。深入りはしませんが、存在を知っておくことに価値があります。</p>
     <div class="card-grid">
       <div class="card">
@@ -1361,12 +1280,12 @@ git commit -m "売上分析ミニアプリを実装"</div>
       </tr>
     </table>
     </div>
-    <p style="font-size:.75rem;color:var(--gray-500);margin-top:4px">料金は2026年3月時点の参考値です。最新の料金体系は各公式サイトで確認してください。</p>
+    <p style="font-size:.75rem;color:var(--gray-500);margin-top:4px">料金は2026年4月時点の参考値です。最新の料金体系は各公式サイトで確認してください。</p>
   </div>
 
   <!-- エンジニアの未来 -->
   <div class="topic">
-    <div class="topic-title"><span>05</span> 3年後、エンジニアは何をしているか</div>
+    <div class="topic-title"><span>06</span> 3年後、エンジニアは何をしているか</div>
 
     <div class="disc">
       <div class="disc-q">生成AIで開発手法がどう変わっていくか。何を追いかけなければならないか。</div>
@@ -1395,14 +1314,13 @@ git commit -m "売上分析ミニアプリを実装"</div>
 
   <!-- 完了チェックリスト -->
   <div class="topic">
-    <div class="topic-title"><span>06</span> 完了チェックリスト</div>
+    <div class="topic-title"><span>07</span> 完了チェックリスト</div>
     <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:12px">研修が終わった時点で、以下が揃っていれば成功です。</p>
     <ul class="check-list">
       <li><code>spec.md</code>（議事メモから作成した仕様書）</li>
       <li><code>.github/copilot-instructions.md</code>（自チーム用Agent MD）</li>
-      <li><code>analyze.py</code>（動作するPythonスクリプト）</li>
-      <li><code>output/</code> 内に集計結果のCSVファイル</li>
-      <li><code>git log</code> で3回分のcommit履歴が見える</li>
+      <li>Agent MDが有効な状態でCopilotの出力が規約準拠になることを確認済み</li>
+      <li><code>git log</code> で2回分のcommit履歴が見える</li>
     </ul>
   </div>
 
@@ -1511,7 +1429,7 @@ git commit -m "売上分析ミニアプリを実装"</div>
 
 <!-- ========== FOOTER ========== -->
 <footer class="site-footer">
-  <p>VS Code × GitHub Copilot AI駆動開発研修 | 2026年3月</p>
+  <p>VS Code × GitHub Copilot AI駆動開発研修 | ダイヤ情報システム株式会社様 | 2026年4月18日</p>
   <p style="margin-top:12px"><img src="data:image/webp;base64,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" alt="Givery" style="height:20px;width:auto;opacity:.6"></p>
 </footer>
 
