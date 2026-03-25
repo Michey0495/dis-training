@@ -518,7 +518,7 @@ td.highlight{color:var(--accent);font-weight:600}
     <ul class="check-list" style="margin-top:4px">
       <li style="display:list-item;visibility:visible">VS Code 最新版がインストールされている</li>
       <li>GitHub Copilot 拡張機能が有効（右下アイコンが青色）</li>
-      <li>Python 3.11以上が動作する（<code>python --version</code>）</li>
+      <li>Python 3.10以上が動作する（<code>python --version</code>）</li>
       <li>Git がインストールされている（<code>git --version</code>）</li>
       <li>pandas がインストールされている（<code>pip install pandas</code>）</li>
       <li>pytest がインストールされている（<code>pip install pytest</code>）</li>
@@ -625,7 +625,7 @@ td.highlight{color:var(--accent);font-weight:600}
     <ul class="check-list">
       <li>VS Code 最新版がインストールされている</li>
       <li>GitHub Copilot 拡張機能が有効になっている（右下のアイコンで確認）</li>
-      <li>Python 3.11以上が動作する（ターミナルで <code>python --version</code>）</li>
+      <li>Python 3.10以上が動作する（ターミナルで <code>python --version</code>）</li>
       <li>Git がインストールされている（ターミナルで <code>git --version</code>）</li>
       <li>pandas がインストールされている（<code>pip install pandas</code>）</li>
       <li>pytest がインストールされている（<code>pip install pytest</code>）</li>
@@ -986,7 +986,7 @@ project-root/
       <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># Copilot Instructions</span>
 
 <span class="comment">## 言語・バージョン</span>
-- Python 3.12
+- Python 3.10
 - 標準ライブラリとpandasを使用
 
 <span class="comment">## コーディング規約</span>
@@ -1758,7 +1758,7 @@ var HANDSON_MEMO = '# 議事メモ：データ分析案件\n\n' +
 
 /* Agent MD テンプレート（Session 03 ハンズオン2） */
 var HANDSON_AGENTMD = '# Copilot Instructions\n\n' +
-'## 言語・バージョン\n- Python 3.12\n- 標準ライブラリとpandasを使用\n\n' +
+'## 言語・バージョン\n- Python 3.10\n- 標準ライブラリとpandasを使用\n\n' +
 '## コーディング規約\n- 型ヒントを必ず付ける\n- docstringはGoogle Styleで書く\n- 変数名・関数名は英語\n- コメントは日本語で書く\n\n' +
 '## 推奨パターン\n- pandasではメソッドチェーンを使う\n- ファイルパスはPathlibを使う\n- 日付処理はpd.to_datetime()を使う\n\n' +
 '## 禁止事項\n- bare except（except: のみ）は禁止。必ず例外型を指定する\n- print()でのデバッグは禁止。loggingモジュールを使う\n- SQL文字列の直接結合は禁止。パラメータ化クエリを使う\n- グローバル変数の使用は禁止\n\n' +
@@ -1909,7 +1909,7 @@ function crc32(bytes) {
 
 var GITHUB_COPILOT_INSTRUCTIONS = '# Copilot Instructions\n\n' +
 'このリポジトリで GitHub Copilot を使う全員に適用される共通ルールです。\n\n' +
-'## 言語・バージョン\n\n- Python 3.12\n- 標準ライブラリと pandas を使用\n- 追加ライブラリが必要な場合は requirements.txt に記載してからインストールする\n\n' +
+'## 言語・バージョン\n\n- Python 3.10\n- 標準ライブラリと pandas を使用\n- 追加ライブラリが必要な場合は requirements.txt に記載してからインストールする\n\n' +
 '## コーディング規約\n\n- 型ヒントを必ず付ける（引数・戻り値の両方）\n- docstring は Google Style で書く\n- 変数名・関数名は英語（snake_case）\n- クラス名は英語（PascalCase）\n- コメントは日本語で書く\n- 1関数は50行以内に収める。超える場合は分割を検討する\n- ネストは最大3階層。それ以上は早期リターンで解消する\n\n' +
 '## 推奨パターン\n\n- pandas ではメソッドチェーンを使う\n- ファイルパスは pathlib.Path を使う（文字列結合は不可）\n- 日付処理は pd.to_datetime() を使う\n- CSV読み込みは encoding="utf-8-sig" を指定する\n- ディレクトリ作成は Path.mkdir(parents=True, exist_ok=True) を使う\n- 設定値は関数の引数かdataclassで管理する\n\n' +
 '## 禁止事項\n\n- bare except（except: のみ）は禁止。必ず例外型を指定する\n- print() でのデバッグは禁止。logging モジュールを使う\n- SQL文字列の直接結合は禁止。パラメータ化クエリを使う\n- グローバル変数の使用は禁止\n- ハードコードされたファイルパスは禁止（引数か定数で渡す）\n- star import（from module import *）は禁止\n\n' +
@@ -1920,7 +1920,7 @@ var GITHUB_COPILOT_INSTRUCTIONS = '# Copilot Instructions\n\n' +
 /* --- .github/instructions/ --- */
 
 var INSTRUCTIONS_PYTHON = '# Python コーディングルール\n\napplyTo: "**/*.py"\n\n' +
-'## バージョン・ランタイム\n\n- Python 3.12 を使用する\n- 仮想環境（venv）を前提とする\n- 依存ライブラリは requirements.txt で管理する\n\n' +
+'## バージョン・ランタイム\n\n- Python 3.10 を使用する\n- 仮想環境（venv）を前提とする\n- 依存ライブラリは requirements.txt で管理する\n\n' +
 '## 型ヒント\n\n- 全ての関数の引数と戻り値に型ヒントを付ける\n- コレクション型は `list[str]`, `dict[str, int]` のように具体型を書く\n- Optional は `str | None` 形式で書く（Python 3.10+ スタイル）\n- 型が複雑な場合は TypeAlias を使う\n\n' +
 '## docstring\n\n- Google Style で統一する\n- 公開関数には必ず書く。内部ヘルパーは省略可\n- Args, Returns, Raises の各セクションを必要に応じて書く\n\n' +
 '## 命名規則\n\n- 変数名・関数名: snake_case（英語）\n- クラス名: PascalCase（英語）\n- 定数: UPPER_SNAKE_CASE\n- プライベート: 先頭アンダースコア `_helper()`\n- コメント: 日本語で書く\n\n' +
