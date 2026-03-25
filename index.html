@@ -677,7 +677,7 @@ td.highlight{color:var(--accent);font-weight:600}
   <!-- コンテキストエンジニアリング -->
   <div class="topic">
     <div class="topic-title"><span>01</span> コンテキストエンジニアリングとは</div>
-    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:20px">AIの出力品質を決める3つの文脈層があります。プロジェクト設定（Agent MD）、開いているファイル群、指示の精度。この3つを設計するのがコンテキストエンジニアリングです。</p>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:20px">AIの出力品質を決める3つの文脈層があります。プロジェクト設定（Agent MD）、開いているファイル群、指示の精度。この3つを設計するのがコンテキストエンジニアリングです。まず手を動かして、文脈の有無で出力がどう変わるか体感してください。</p>
 
     <div class="card-grid">
       <div class="card">
@@ -696,52 +696,92 @@ td.highlight{color:var(--accent);font-weight:600}
         <p>「何を」「どの形式で」「何を除外して」生成するか。制約指示が効くかどうかが出力品質の分かれ目になります。</p>
       </div>
     </div>
+  </div>
 
-    <div class="callout">
-      <div class="callout-title">事例 : 同じ指示でも文脈で出力が変わる</div>
-      <p>「CSVを読み込んで集計する関数を書いて」という指示を2通りの方法で試した結果です。</p>
+  <!-- 体験1: 文脈なし vs 文脈あり -->
+  <div class="handson-block">
+    <div class="handson-header">
+      <div class="handson-badge">TRY IT</div>
+      <div class="handson-title">体験 : 文脈なし vs 文脈ありで出力を比較する（10分）</div>
     </div>
-    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># 文脈なしで指示した場合の出力例</span>
-<span class="kw">def</span> <span class="key">process</span>(file):
-    data = pd.read_csv(file)
-    result = data.groupby(<span class="str">'部門'</span>).sum()
-    result.to_csv(<span class="str">'output.csv'</span>)
-    <span class="comment"># 型ヒントなし、変数名が曖昧、エラー処理なし</span></div>
-    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># Agent MD + 仕様書を文脈に渡した場合の出力例</span>
-<span class="kw">def</span> <span class="key">aggregate_sales_by_dept</span>(input_path: Path) -&gt; pd.DataFrame:
-    <span class="str">"""部門別の売上合計を算出する。
+    <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:20px">同じ指示でも、渡す文脈で出力がまるで変わることを自分の手で確認します。</p>
 
-    Args:
-        input_path: 売上データCSVのファイルパス
-
-    Returns:
-        部門ごとの売上合計DataFrame
-    """</span>
-    df = pd.read_csv(input_path, encoding=<span class="str">"utf-8-sig"</span>)
-    <span class="kw">return</span> (
-        df.dropna(subset=[<span class="str">"売上金額"</span>])
-        .groupby(<span class="str">"部門"</span>, as_index=<span class="kw">False</span>)
-        .agg(売上合計=(<span class="str">"売上金額"</span>, <span class="str">"sum"</span>))
-    )
-    <span class="comment"># 型ヒント付き、Google Style docstring、メソッドチェーン</span></div>
-    <p style="font-size:.85rem;color:var(--gray-700);margin:12px 0">渡す文脈が違うだけで、同じツールの出力がここまで変わります。プロンプトの書き方を工夫する前に、何を渡すかを設計するのが先です。</p>
-
-    <div class="disc">
-      <div class="disc-q">「チャットで聞いて要約を編集する」使い方と「文脈を設計して一発で正しい出力を得る」使い方。この差は何から生まれると思いますか?</div>
-      <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:8px">まずは皆さんで考えてみてください。</p>
-      <button class="disc-toggle" onclick="toggleDisc(this)">回答</button>
-      <div class="disc-answer">
-        <div class="disc-point" style="margin-top:14px">
-          <h5>差の正体は「事前設計の有無」</h5>
-          <p>チャットで何度もやり取りするのは、必要な文脈をその場で思いつきで渡しているから。仕様書やAgent MDを事前に書いておけば、1回の指示で精度の高い出力が得られます。事後の修正コストと事前の設計コスト、どちらが安いかという話です。</p>
-        </div>
-        <div class="disc-point">
-          <h5>コンテキスト設計はチーム施策</h5>
-          <p>個人がプロンプトを工夫するのは属人的。Agent MDをリポジトリに入れるのはチーム施策。仕組みで解決すれば、メンバー全員のAI出力品質が揃います。</p>
-        </div>
+    <div class="handson-step">
+      <div class="handson-step-num">1</div>
+      <div class="handson-step-body">
+        <strong>文脈なしで指示する（2分）</strong>
+        <p>Copilot Chat（Ctrl+Shift+I / Cmd+Shift+I）を開き、以下をそのまま貼り付けてください。何もファイルを開いていない状態で試します。</p>
       </div>
     </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">CSVファイルを読み込んで、部門ごとの売上合計を集計する関数を書いて</div>
+    <p style="font-size:.85rem;color:var(--gray-700);margin:8px 0 16px">出力を確認してください。型ヒントはありますか? docstringのスタイルは? 変数名は英語ですか日本語ですか? エラー処理はどうなっていますか?</p>
 
+    <div class="handson-step">
+      <div class="handson-step-num">2</div>
+      <div class="handson-step-body">
+        <strong>要件ファイルを作成する（3分）</strong>
+        <p>VS Codeで新しいファイル <code>requirements.md</code> を作成し、以下の内容を貼り付けて保存してください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># 売上集計ツール 要件</span>
+
+<span class="comment">## 入力</span>
+- CSV（UTF-8 BOM付き）
+- カラム: 日付, 部門, 商品名, 数量, 単価, 売上金額, 地域
+
+<span class="comment">## 処理</span>
+- 欠損データ（空の値）は除外して集計する
+- 部門ごとの売上合計を算出する
+
+<span class="comment">## 出力</span>
+- 結果はCSVファイルとして output/ に保存
+- 文字コードはUTF-8 BOM付き
+- 日付フォーマットはYYYY-MM-DD
+
+<span class="comment">## コーディング規約</span>
+- Python 3.10、型ヒント必須
+- docstringはGoogle Style
+- 変数名・関数名は英語、コメントは日本語
+- pandasのメソッドチェーンを使う
+- ファイルパスはpathlibを使う
+- bare except禁止、print()デバッグ禁止</div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">3</div>
+      <div class="handson-step-body">
+        <strong>文脈ありで同じ指示を出す（2分）</strong>
+        <p>新しいCopilot Chatを開き（既存のチャットではなく新規で）、今度は #file: で要件ファイルを渡してから同じ指示を出してください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="key">#file:</span><span class="str">requirements.md</span>
+
+CSVファイルを読み込んで、部門ごとの売上合計を集計する関数を書いて</div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">4</div>
+      <div class="handson-step-body">
+        <strong>2つの出力を見比べる（3分）</strong>
+        <p>以下の観点で差を確認してください。</p>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>観点</th><th>文脈なし（Step 1）</th><th>文脈あり（Step 3）</th></tr>
+      <tr><td>型ヒント</td><td>なし or 不完全</td><td class="highlight">全引数・戻り値に付与</td></tr>
+      <tr><td>docstring</td><td>なし or 自由書式</td><td class="highlight">Google Style</td></tr>
+      <tr><td>変数名</td><td>日本語混じり</td><td class="highlight">英語で統一</td></tr>
+      <tr><td>エラー処理</td><td>bare except or なし</td><td class="highlight">例外型を指定</td></tr>
+      <tr><td>ファイルパス</td><td>文字列</td><td class="highlight">pathlib</td></tr>
+    </table>
+    </div>
+
+    <div class="callout callout-handson">
+      <div class="callout-title">ここがコンテキストエンジニアリングの核</div>
+      <p>プロンプトの一文字も変えていません。変えたのは「渡した文脈」だけ。要件ファイル1枚で出力品質がここまで変わります。この差を仕組みとしてチームに定着させるのがSession 03で扱うAgent MDです。</p>
+    </div>
+  </div>
+
+  <div class="topic">
     <button class="reveal-btn" data-label="Claude Codeから降りてきた機能の系譜" onclick="revealSection(this)">Claude Codeから降りてきた機能の系譜</button>
     <div class="instructor-reveal">
       <p style="font-size:.9rem;color:var(--gray-700);margin:16px 0">copilot-instructions.md の設計思想は <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank">Claude Code</a> の CLAUDE.md が原型です。エージェントモードも同じ系譜。GitHub Copilotの「新機能」として見るのではなく、AI開発ツールに共通する設計思想として理解すると、ツールが変わっても応用が利きます。</p>
@@ -755,19 +795,9 @@ td.highlight{color:var(--accent);font-weight:600}
     </div>
   </div>
 
-  <!-- AI駆動ドキュメンテーション -->
-  <div class="topic">
-    <div class="topic-title"><span>02</span> AI駆動ドキュメンテーション</div>
-    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">AI駆動開発を進めるうえで、AIが読み取りやすいドキュメントを事前に準備する必要があります。フリーフォーマットのメモではなく、構造化されたMarkdownで書く。この準備の質が実装フェーズの出力精度を左右します。</p>
-    <div class="callout">
-      <div class="callout-title">Tip</div>
-      <p>「仕様を先に書き、実装はその後」。この順番が核です。言語やフレームワークに依存しない普遍的な考え方で、JavaでもTypeScriptでも同じ型が使えます。あるべき姿を先に示すことで、AIの出力精度が上がります。</p>
-    </div>
-  </div>
-
   <!-- 仕様駆動開発 -->
   <div class="topic">
-    <div class="topic-title"><span>03</span> 仕様駆動開発</div>
+    <div class="topic-title"><span>02</span> 仕様駆動開発</div>
     <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">仕様を書かずにいきなりコードを書かせると、AIは「動くが使えないもの」を量産します。メモから要件を抽出し、Markdownで構造化し、仕様書にまとめる。この工程を経てから実装に入ると手戻りが激減します。</p>
 
     <div class="stat-grid">
@@ -784,34 +814,101 @@ td.highlight{color:var(--accent);font-weight:600}
         <div class="stat-label">仕様書があるときの<br>AI出力修正回数比</div>
       </div>
     </div>
+  </div>
+
+  <!-- 体験2: 制約指示の効果 -->
+  <div class="handson-block">
+    <div class="handson-header">
+      <div class="handson-badge">TRY IT</div>
+      <div class="handson-title">体験 : 制約指示がないとAIは何をするか（5分）</div>
+    </div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:20px">メモからの要件抽出で、制約の有無が出力にどう影響するか試します。</p>
+
+    <div class="handson-step">
+      <div class="handson-step-num">1</div>
+      <div class="handson-step-body">
+        <strong>制約なしで要件を聞く</strong>
+        <p>Copilot Chatに以下を貼り付けてください（制約なし版）。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">以下の議事メモから、開発すべき機能の要件を整理してください。
+
+# 議事メモ
+営業企画部では売上CSVを手作業で集計している。月次報告のたびに3日かかる。
+部門別・月別の集計と、地域ごとの構成比を出したい。Pythonで自動化する。
+実行はコマンドラインから。GUIは不要。</div>
+    <p style="font-size:.85rem;color:var(--gray-700);margin:8px 0">出力を確認してください。メモに書かれていない機能（認証、通知、ダッシュボード等）が追加されていませんか?</p>
+
+    <div class="handson-step">
+      <div class="handson-step-num">2</div>
+      <div class="handson-step-body">
+        <strong>制約ありで同じメモを渡す</strong>
+        <p>新しいチャットを開き、末尾に制約を1行追加したバージョンを試してください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6">以下の議事メモから、開発すべき機能の要件を整理してください。
+<span class="key">メモに書かれていない要件は追加しないでください。</span>
+
+# 議事メモ
+営業企画部では売上CSVを手作業で集計している。月次報告のたびに3日かかる。
+部門別・月別の集計と、地域ごとの構成比を出したい。Pythonで自動化する。
+実行はコマンドラインから。GUIは不要。</div>
 
     <div class="callout callout-warn">
-      <div class="callout-title">メモから仕様書を作るとき、ありがちな失敗</div>
-      <p>メモの箇条書きをそのままAIに渡して「仕様書にして」と頼むと、AIが親切心で勝手に要件を追加します。ログイン機能、通知機能、権限管理など、メモに根拠がない機能が混入するのが典型例です。「メモに書かれていない要件は追加しないでください」という制約を明示しないと、仕様書の段階でスコープが膨張し、手戻りの種になります。</p>
+      <div class="callout-title">差が出たはずです</div>
+      <p>制約なし版ではAIが「親切心で」認証機能、ログ出力、多言語対応などを追加しがちです。制約あり版ではメモに根拠がある機能だけが出力されます。「追加しないで」のたった一文が、仕様のスコープ膨張を防ぐ防波堤になります。</p>
     </div>
-
-    <!-- デモ: 仕様駆動開発 -->
-    <button class="demo-btn" onclick="openModal('demo-spec')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polygon points="5 3 19 12 5 21 5 3"/>
-      </svg>
-      デモ : メモから仕様書を作成する
-    </button>
   </div>
 
   <!-- コメントドリブン開発 -->
   <div class="topic">
-    <div class="topic-title"><span>04</span> コメントドリブン開発</div>
-    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">「こういう使い方もある」という紹介です。関数の上にコメントを先に書き、Copilotにそのコメントからコード補完させる手法。仕様駆動開発の考え方をコードレベルに落とし込んだものと言えます。</p>
-    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="comment"># 部門ごとの月別売上合計を算出する</span>
+    <div class="topic-title"><span>03</span> コメントドリブン開発</div>
+    <p style="font-size:.9rem;color:var(--gray-700);margin-bottom:16px">関数の上にコメントを先に書き、Copilotにコード補完させる手法です。仕様駆動開発の考え方をコードレベルに落とし込んだもの。実際にやってみてください。</p>
+  </div>
+
+  <!-- 体験3: コメントドリブン -->
+  <div class="handson-block">
+    <div class="handson-header">
+      <div class="handson-badge">TRY IT</div>
+      <div class="handson-title">体験 : コメントを先に書いてCopilotに補完させる（5分）</div>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">1</div>
+      <div class="handson-step-body">
+        <strong>Pythonファイルを作成する</strong>
+        <p>VS Codeで <code>practice.py</code> を新規作成し、以下を貼り付けてください。</p>
+      </div>
+    </div>
+    <div class="code-block" style="white-space:pre;line-height:1.6"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+
+<span class="comment"># 部門ごとの月別売上合計を算出する</span>
 <span class="comment"># 引数: DataFrame（売上データ）</span>
 <span class="comment"># 戻り値: 部門×年月の集計DataFrame</span>
 <span class="comment"># pandasのメソッドチェーンを使用する</span>
-<span class="kw">def</span> <span class="key">aggregate_dept_monthly</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
-    <span class="comment"># Copilotがコメントを読んで本体を補完する</span></div>
+<span class="kw">def</span> <span class="key">aggregate_dept_monthly</span>(df: pd.DataFrame) -&gt; pd.DataFrame:</div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">2</div>
+      <div class="handson-step-body">
+        <strong>関数本体の行でEnterを押し、Tabキーで補完を受け入れる</strong>
+        <p><code>def</code> 行の末尾にカーソルを置いてEnterキー。Copilotがコメントと型ヒントを読み取り、関数本体を提案します。灰色のサジェストが出たら Tab で受け入れてください。</p>
+      </div>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">3</div>
+      <div class="handson-step-body">
+        <strong>コメントを変えて再試行する</strong>
+        <p>コメントの「メソッドチェーンを使用する」を「forループで集計する」に変えてみてください。Copilotの出力が変わるのを確認します。コメントが仕様として機能していることが体感できるはずです。</p>
+      </div>
+    </div>
+
     <div class="callout">
       <div class="callout-title">Tip</div>
-      <p>型ヒントとコメントを書いてからTabキーを押す。Copilotは関数名・型ヒント・コメントの3つから本体を推測します。Agent MDで「型ヒント必須」と設定してある場合、この精度がさらに上がります。詳しい補完の活用法は <a href="https://docs.github.com/en/copilot/using-github-copilot/getting-code-suggestions-in-your-ide-with-github-copilot" target="_blank">GitHub Copilot コード補完ガイド</a> を参照してください。</p>
+      <p>型ヒント + コメント + 関数名の3点が揃うとCopilotの推測精度が跳ね上がります。Agent MDで「型ヒント必須」「docstringはGoogle Style」を設定しておくと、この精度がさらに安定します。詳しくは <a href="https://docs.github.com/en/copilot/using-github-copilot/getting-code-suggestions-in-your-ide-with-github-copilot" target="_blank">GitHub Copilot コード補完ガイド</a> を参照してください。</p>
     </div>
   </div>
 
@@ -1060,6 +1157,44 @@ project-root/
     <div class="callout">
       <div class="callout-title">Tip</div>
       <p>#file: で仕様書を渡し、Agent MDでコーディング規約を効かせた状態でコード生成を指示する。この組み合わせが実務での基本形です。</p>
+    </div>
+  </div>
+
+  <!-- 体験: インラインチャット -->
+  <div class="handson-block">
+    <div class="handson-header">
+      <div class="handson-badge">TRY IT</div>
+      <div class="handson-title">体験 : インラインチャットでコードを操作する（5分）</div>
+    </div>
+    <p style="font-size:.88rem;color:var(--gray-700);margin-bottom:20px">Session 02で作った practice.py を使い、選択範囲への直接操作を試します。</p>
+
+    <div class="handson-step">
+      <div class="handson-step-num">1</div>
+      <div class="handson-step-body">
+        <strong>関数を選択して説明させる</strong>
+        <p><code>practice.py</code> の関数全体を選択し、Ctrl+I（Cmd+I）で「この関数を日本語で説明して」と入力してください。</p>
+      </div>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">2</div>
+      <div class="handson-step-body">
+        <strong>選択範囲をリファクタリングさせる</strong>
+        <p>同じ関数を選択した状態で Ctrl+I → 「エラーハンドリングを追加して。FileNotFoundError をキャッチして日本語でメッセージを出す」と指示してください。</p>
+      </div>
+    </div>
+
+    <div class="handson-step">
+      <div class="handson-step-num">3</div>
+      <div class="handson-step-body">
+        <strong>テストコードを生成させる</strong>
+        <p>同じ関数を選択 → Ctrl+I → 「この関数のpytestテストを書いて。正常系と空DataFrameの異常系を含めて」。Agent MDが効いていれば、テストも規約準拠で出力されます。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-handson">
+      <div class="callout-title">インラインチャットのポイント</div>
+      <p>Copilot Chatはプロジェクト全体の質問に向いています。インラインチャットは「今見ているこのコード」に対して操作する場面で使います。選択範囲が文脈になるので、指示が短くても精度が高い。実務では両方を使い分けてください。</p>
     </div>
   </div>
 
